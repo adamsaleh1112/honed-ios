@@ -11,6 +11,16 @@
 		A1234567890ABCDEF003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF004 /* ContentView.swift */; };
 		A1234567890ABCDEF005 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF006 /* Assets.xcassets */; };
 		A1234567890ABCDEF007 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF008 /* Preview Assets.xcassets */; };
+		A1234567890ABCDEF030 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF031 /* AppState.swift */; };
+		A1234567890ABCDEF032 /* VideoEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF033 /* VideoEntry.swift */; };
+		A1234567890ABCDEF034 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF035 /* NotificationManager.swift */; };
+		A1234567890ABCDEF036 /* VideoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF037 /* VideoManager.swift */; };
+		A1234567890ABCDEF038 /* StreakManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF039 /* StreakManager.swift */; };
+		A1234567890ABCDEF040 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF041 /* OnboardingView.swift */; };
+		A1234567890ABCDEF042 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF043 /* HomeView.swift */; };
+		A1234567890ABCDEF044 /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF045 /* RecordingView.swift */; };
+		A1234567890ABCDEF046 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF047 /* TimelineView.swift */; };
+		A1234567890ABCDEF048 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF049 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +30,16 @@
 		A1234567890ABCDEF008 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A1234567890ABCDEF009 /* Becoming.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Becoming.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1234567890ABCDEF010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1234567890ABCDEF031 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF033 /* VideoEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoEntry.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF035 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF037 /* VideoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoManager.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF039 /* StreakManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakManager.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF041 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF043 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF045 /* RecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF047 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF049 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,11 +66,45 @@
 			children = (
 				A1234567890ABCDEF002 /* BecomingApp.swift */,
 				A1234567890ABCDEF004 /* ContentView.swift */,
+				A1234567890ABCDEF050 /* Models */,
+				A1234567890ABCDEF051 /* Managers */,
+				A1234567890ABCDEF052 /* Views */,
 				A1234567890ABCDEF006 /* Assets.xcassets */,
 				A1234567890ABCDEF010 /* Info.plist */,
 				A1234567890ABCDEF015 /* Preview Content */,
 			);
 			path = Becoming;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF050 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890ABCDEF031 /* AppState.swift */,
+				A1234567890ABCDEF033 /* VideoEntry.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF051 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890ABCDEF035 /* NotificationManager.swift */,
+				A1234567890ABCDEF037 /* VideoManager.swift */,
+				A1234567890ABCDEF039 /* StreakManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF052 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890ABCDEF041 /* OnboardingView.swift */,
+				A1234567890ABCDEF043 /* HomeView.swift */,
+				A1234567890ABCDEF045 /* RecordingView.swift */,
+				A1234567890ABCDEF047 /* TimelineView.swift */,
+				A1234567890ABCDEF049 /* SettingsView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		A1234567890ABCDEF014 /* Products */ = {
@@ -141,6 +195,16 @@
 			files = (
 				A1234567890ABCDEF003 /* ContentView.swift in Sources */,
 				A1234567890ABCDEF001 /* BecomingApp.swift in Sources */,
+				A1234567890ABCDEF030 /* AppState.swift in Sources */,
+				A1234567890ABCDEF032 /* VideoEntry.swift in Sources */,
+				A1234567890ABCDEF034 /* NotificationManager.swift in Sources */,
+				A1234567890ABCDEF036 /* VideoManager.swift in Sources */,
+				A1234567890ABCDEF038 /* StreakManager.swift in Sources */,
+				A1234567890ABCDEF040 /* OnboardingView.swift in Sources */,
+				A1234567890ABCDEF042 /* HomeView.swift in Sources */,
+				A1234567890ABCDEF044 /* RecordingView.swift in Sources */,
+				A1234567890ABCDEF046 /* TimelineView.swift in Sources */,
+				A1234567890ABCDEF048 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
