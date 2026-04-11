@@ -14,11 +14,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A1234567890ABCDEF009 /* Becoming.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Becoming.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1234567890ABCDEF002 /* BecomingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BecomingApp.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF006 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1234567890ABCDEF008 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		A1234567890ABCDEF009 /* Becoming.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Becoming.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1234567890ABCDEF010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -41,14 +41,6 @@
 			);
 			sourceTree = "<group>";
 		};
-		A1234567890ABCDEF014 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				A1234567890ABCDEF009 /* Becoming.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		A1234567890ABCDEF013 /* Becoming */ = {
 			isa = PBXGroup;
 			children = (
@@ -59,6 +51,14 @@
 				A1234567890ABCDEF015 /* Preview Content */,
 			);
 			path = Becoming;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF014 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890ABCDEF009 /* Becoming.app */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		A1234567890ABCDEF015 /* Preview Content */ = {
@@ -274,6 +274,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Becoming/Preview Content\"";
+				DEVELOPMENT_TEAM = GG2H8A5KTB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Becoming/Info.plist;
@@ -308,6 +309,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Becoming/Preview Content\"";
+				DEVELOPMENT_TEAM = GG2H8A5KTB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Becoming/Info.plist;
@@ -337,20 +339,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A1234567890ABCDEF021 /* Build configuration list for PBXProject "Becoming" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A1234567890ABCDEF022 /* Debug */,
-				A1234567890ABCDEF023 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		A1234567890ABCDEF017 /* Build configuration list for PBXNativeTarget "Becoming" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A1234567890ABCDEF024 /* Debug */,
 				A1234567890ABCDEF025 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1234567890ABCDEF021 /* Build configuration list for PBXProject "Becoming" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1234567890ABCDEF022 /* Debug */,
+				A1234567890ABCDEF023 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
