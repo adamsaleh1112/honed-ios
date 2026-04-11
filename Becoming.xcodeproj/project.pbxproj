@@ -21,6 +21,7 @@
 		A1234567890ABCDEF044 /* RecordingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF045 /* RecordingView.swift */; };
 		A1234567890ABCDEF046 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF047 /* TimelineView.swift */; };
 		A1234567890ABCDEF048 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF049 /* SettingsView.swift */; };
+		A1234567890ABCDEF050 /* CalendarTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF051 /* CalendarTimelineView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		A1234567890ABCDEF045 /* RecordingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingView.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF047 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF049 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF051 /* CalendarTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarTimelineView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 				A1234567890ABCDEF045 /* RecordingView.swift */,
 				A1234567890ABCDEF047 /* TimelineView.swift */,
 				A1234567890ABCDEF049 /* SettingsView.swift */,
+				A1234567890ABCDEF051 /* CalendarTimelineView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -205,6 +208,7 @@
 				A1234567890ABCDEF044 /* RecordingView.swift in Sources */,
 				A1234567890ABCDEF046 /* TimelineView.swift in Sources */,
 				A1234567890ABCDEF048 /* SettingsView.swift in Sources */,
+				A1234567890ABCDEF050 /* CalendarTimelineView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

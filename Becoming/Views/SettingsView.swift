@@ -17,7 +17,7 @@ struct SettingsView: View {
                             VStack(spacing: 16) {
                                 HStack {
                                     Text("Daily reminder")
-                                        .font(.custom("Times New Roman", size: 16))
+                                        .font(.system(size: 16))
                                         .foregroundColor(.white)
                                     Spacer()
                                     DatePicker("", selection: $appState.notificationTime, displayedComponents: .hourAndMinute)
@@ -26,7 +26,7 @@ struct SettingsView: View {
                                 }
                                 
                                 Toggle("One take mode", isOn: $appState.oneTakeMode)
-                                    .font(.custom("Times New Roman", size: 16))
+                                    .font(.system(size: 16))
                                     .foregroundColor(.white)
                             }
                         }
@@ -119,8 +119,7 @@ struct SettingsSection<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
-                .font(.custom("Times New Roman", size: 18))
-                .fontWeight(.medium)
+                .font(.system(size: 18, weight: .medium))
                 .foregroundColor(.white)
             
             VStack(spacing: 12) {
@@ -140,13 +139,12 @@ struct StatRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.custom("Times New Roman", size: 16))
+                .font(.system(size: 16))
                 .foregroundColor(.gray)
             Spacer()
             Text(value)
-                .font(.custom("Times New Roman", size: 16))
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(.white)
-                .fontWeight(.semibold)
         }
     }
 }
@@ -158,11 +156,11 @@ struct InfoRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.custom("Times New Roman", size: 16))
+                .font(.system(size: 16))
                 .foregroundColor(.gray)
             Spacer()
             Text(value)
-                .font(.custom("Times New Roman", size: 16))
+                .font(.system(size: 16))
                 .foregroundColor(.white)
         }
     }

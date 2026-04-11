@@ -26,8 +26,7 @@ struct OnboardingView: View {
                 
                 Button(action: nextStep) {
                     Text(currentStep == 3 ? "Start your journey" : "Continue")
-                        .font(.custom("Times New Roman", size: 18))
-                        .fontWeight(.medium)
+                        .font(.system(size: 18, weight: .medium))
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
                         .padding(16)
@@ -44,8 +43,7 @@ struct OnboardingView: View {
     private func WelcomeStep() -> some View {
         VStack(spacing: 30) {
             Text("Talk to your future self.")
-                .font(.custom("Times New Roman", size: 28))
-                .fontWeight(.medium)
+                .font(.system(size: 28, weight: .medium))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
             
@@ -62,12 +60,11 @@ struct OnboardingView: View {
     private func NotificationStep() -> some View {
         VStack(spacing: 30) {
             Text("Daily reminder")
-                .font(.custom("Times New Roman", size: 32))
-                .fontWeight(.medium)
+                .font(.system(size: 32, weight: .medium))
                 .foregroundColor(.white)
             
             Text("When should we remind you to record?")
-                .font(.custom("Times New Roman", size: 20))
+                .font(.system(size: 20))
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
             
@@ -81,22 +78,21 @@ struct OnboardingView: View {
     private func OneTakeModeStep() -> some View {
         VStack(spacing: 30) {
             Text("One take mode")
-                .font(.custom("Times New Roman", size: 32))
-                .fontWeight(.medium)
+                .font(.system(size: 32, weight: .medium))
                 .foregroundColor(.white)
             
             Text("Force authenticity by limiting retakes")
-                .font(.custom("Times New Roman", size: 20))
+                .font(.system(size: 20))
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
             
             VStack(spacing: 20) {
                 Toggle("Enable one take mode", isOn: $appState.oneTakeMode)
-                    .font(.custom("Times New Roman", size: 18))
+                    .font(.system(size: 18))
                     .foregroundColor(.white)
                 
                 Text("When enabled, you only get one attempt to record. This reduces perfectionism and keeps your logs authentic.")
-                    .font(.custom("Times New Roman", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
             }
@@ -107,25 +103,24 @@ struct OnboardingView: View {
     private func CompletionStep() -> some View {
         VStack(spacing: 30) {
             Text("You're ready!")
-                .font(.custom("Times New Roman", size: 32))
-                .fontWeight(.medium)
+                .font(.system(size: 32, weight: .medium))
                 .foregroundColor(.white)
             
             Text("Don't let your life go unrecorded.")
-                .font(.custom("Times New Roman", size: 20))
+                .font(.system(size: 20))
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
             
             VStack(spacing: 15) {
                 Text("Remember:")
-                    .font(.custom("Times New Roman", size: 18))
+                    .font(.system(size: 18))
                     .foregroundColor(.white)
                 
                 Text("• Show up every day")
                 Text("• Speak honestly")
                 Text("• Watch yourself grow")
             }
-            .font(.custom("Times New Roman", size: 16))
+            .font(.system(size: 16))
             .foregroundColor(.gray)
         }
     }
@@ -155,7 +150,7 @@ struct FeatureRow: View {
                 .frame(width: 24)
             
             Text(text)
-                .font(.custom("Times New Roman", size: 16))
+                .font(.system(size: 16))
                 .foregroundColor(.gray)
             
             Spacer()
