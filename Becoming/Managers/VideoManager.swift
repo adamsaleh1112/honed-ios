@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 import Photos
+import UIKit
 
 class VideoManager: ObservableObject {
     @Published var videoEntries: [VideoEntry] = []
@@ -34,16 +35,21 @@ class VideoManager: ObservableObject {
     
     func saveVideo(url: URL) {
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let fileName = "video_\(Date().timeIntervalSince1970).mov"
+        let timestamp = Date().timeIntervalSince1970
+        let fileName = "video_\(timestamp).mov"
         let destinationURL = documentsPath.appendingPathComponent(fileName)
         
         do {
             try FileManager.default.copyItem(at: url, to: destinationURL)
             
+            // Generate thumbnail
+            let thumbnailURL = generateThumbnail(for: destinationURL, timestamp: timestamp)
+            
             let videoEntry = VideoEntry(
                 date: Date(),
                 videoURL: destinationURL,
-                duration: recordingDuration
+                duration: recordingDuration,
+                thumbnailURL: thumbnailURL
             )
             
             videoEntries.insert(videoEntry, at: 0)
@@ -52,6 +58,32 @@ class VideoManager: ObservableObject {
         } catch {
             print("Error saving video: \(error)")
         }
+    }
+    
+    private func generateThumbnail(for videoURL: URL, timestamp: TimeInterval) -> URL? {
+        let asset = AVAsset(url: videoURL)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        imageGenerator.appliesPreferredTrackTransform = true
+        
+        let time = CMTime(seconds: 1, preferredTimescale: 60) // 1 second in
+        
+        do {
+            let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
+            let image = UIImage(cgImage: cgImage)
+            
+            // Save thumbnail
+            let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let thumbnailURL = documentsPath.appendingPathComponent("thumb_\(timestamp).jpg")
+            
+            if let data = image.jpegData(compressionQuality: 0.7) {
+                try data.write(to: thumbnailURL)
+                return thumbnailURL
+            }
+        } catch {
+            print("Error generating thumbnail: \(error)")
+        }
+        
+        return nil
     }
     
     func getVideoForDate(_ date: Date) -> VideoEntry? {

@@ -129,20 +129,34 @@ struct VideoPlayerView: View {
     let videoURL: URL
     let entry: VideoEntry
     @Environment(\.dismiss) private var dismiss
+    @State private var player: AVPlayer?
     
     var body: some View {
         NavigationView {
             ZStack {
                 Color.black.ignoresSafeArea()
                 
-                VideoPlayer(player: AVPlayer(url: videoURL))
-                    .aspectRatio(9/16, contentMode: .fit)
+                if let player = player {
+                    VideoPlayer(player: player)
+                        .onAppear {
+                            player.play()
+                        }
+                        .onDisappear {
+                            player.pause()
+                        }
+                } else {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                }
             }
             .navigationTitle(entry.formattedDate)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(trailing: Button("Done") {
                 dismiss()
             })
+        }
+        .onAppear {
+            player = AVPlayer(url: videoURL)
         }
     }
 }

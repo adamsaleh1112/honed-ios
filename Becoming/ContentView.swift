@@ -22,30 +22,51 @@ struct MainView: View {
     @EnvironmentObject var streakManager: StreakManager
     @State private var showingRecordingView = false
     @State private var showingSettingsView = false
+    @State private var selectedDate = Date()
     
     var body: some View {
         ZStack {
-            Color(red: 0.1, green: 0.1, blue: 0.1).ignoresSafeArea()
+            Color.black.ignoresSafeArea()
             
             VStack(spacing: 0) {
                 // Date Header
-                DateHeaderView()
+                DateHeaderView(selectedDate: $selectedDate)
                     .padding(.horizontal, 20)
                     .padding(.top, 10)
                 
                 // Calendar Timeline - expanded to take more vertical space
-                CalendarTimelineView()
+                CalendarTimelineView(selectedDate: $selectedDate)
                     .padding(.horizontal, 20)
                     .padding(.top, 30)
                 
                 Spacer()
             }
             
-            // Floating Record Button
+            // Bottom buttons
             VStack {
                 Spacer()
                 HStack {
+                    // Settings Button - Liquid Glass style
+                    Button(action: {
+                        showingSettingsView = true
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                                .background(Circle().fill(.white.opacity(0.05)))
+                                .frame(width: 56, height: 56)
+                            
+                            Image(systemName: "gearshape.fill")
+                                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+                        }
+                    }
+                    .padding(.leading, 24)
+                    .padding(.bottom, 50)
+                    
                     Spacer()
+                    
                     FloatingRecordButton {
                         showingRecordingView = true
                     }
@@ -54,7 +75,7 @@ struct MainView: View {
                 }
             }
         }
-        .sheet(isPresented: $showingRecordingView) {
+        .fullScreenCover(isPresented: $showingRecordingView) {
             RecordingView()
         }
         .sheet(isPresented: $showingSettingsView) {
@@ -64,63 +85,55 @@ struct MainView: View {
 }
 
 struct DateHeaderView: View {
-    private let today = Date()
+    @Binding var selectedDate: Date
     @State private var isVisible = false
+    
+    private var monthNumber: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM"
+        return formatter.string(from: selectedDate)
+    }
     
     private var dayNumber: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd"
-        return formatter.string(from: today)
+        return formatter.string(from: selectedDate)
     }
     
-    private var dayName: String {
+    private var yearNumber: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE"
-        return formatter.string(from: today)
-    }
-    
-    private var monthAndDay: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM dd"
-        return formatter.string(from: today)
+        formatter.dateFormat = "yy"
+        return formatter.string(from: selectedDate)
     }
     
     var body: some View {
-        HStack(alignment: .top, spacing: 20) {
-            // Large day number on the left
+        HStack(alignment: .firstTextBaseline, spacing: 0) {
+            // Month (grayed out)
+            Text(monthNumber)
+                .font(.system(size: 64, weight: .bold, design: .rounded))
+                .foregroundColor(.white.opacity(0.4))
+                .transition(.asymmetric(insertion: .move(edge: .leading).combined(with: .opacity), removal: .move(edge: .trailing).combined(with: .opacity)))
+                .id("month-\(monthNumber)")
+            
+            // Day (white)
             Text(dayNumber)
-                .font(.system(size: 72, weight: .bold, design: .rounded))
+                .font(.system(size: 64, weight: .bold, design: .rounded))
                 .foregroundColor(.white)
-                .scaleEffect(isVisible ? 1.0 : 0.8)
-                .opacity(isVisible ? 1.0 : 0.0)
-                .animation(.spring(response: 0.8, dampingFraction: 0.6, blendDuration: 0), value: isVisible)
+                .transition(.asymmetric(insertion: .scale(scale: 1.2).combined(with: .opacity), removal: .scale(scale: 0.8).combined(with: .opacity)))
+                .id("day-\(dayNumber)")
+            
+            // Year (grayed out)
+            Text(yearNumber)
+                .font(.system(size: 64, weight: .bold, design: .rounded))
+                .foregroundColor(.white.opacity(0.4))
+                .transition(.asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity), removal: .move(edge: .leading).combined(with: .opacity)))
+                .id("year-\(yearNumber)")
             
             Spacer()
-            
-            // Day name and date on the right
-            VStack(alignment: .trailing, spacing: 6) {
-                Text(dayName)
-                    .font(.system(size: 22, weight: .semibold, design: .rounded))
-                    .foregroundColor(.white.opacity(0.9))
-                    .offset(x: isVisible ? 0 : 30)
-                    .opacity(isVisible ? 1.0 : 0.0)
-                    .animation(.spring(response: 0.6, dampingFraction: 0.8, blendDuration: 0).delay(0.1), value: isVisible)
-                
-                Text(monthAndDay)
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .foregroundColor(.white.opacity(0.6))
-                    .offset(x: isVisible ? 0 : 30)
-                    .opacity(isVisible ? 1.0 : 0.0)
-                    .animation(.spring(response: 0.6, dampingFraction: 0.8, blendDuration: 0).delay(0.2), value: isVisible)
-            }
         }
         .padding(.vertical, 16)
         .padding(.horizontal, 4)
-        .onAppear {
-            withAnimation {
-                isVisible = true
-            }
-        }
+        .animation(.spring(response: 0.5, dampingFraction: 0.7, blendDuration: 0), value: selectedDate)
     }
 }
 
@@ -185,4 +198,9 @@ struct FloatingRecordButton: View {
         .environmentObject(NotificationManager())
         .environmentObject(VideoManager())
         .environmentObject(StreakManager())
+}
+
+#Preview("Date Header") {
+    DateHeaderView(selectedDate: .constant(Date()))
+        .background(Color(red: 0.1, green: 0.1, blue: 0.1))
 }

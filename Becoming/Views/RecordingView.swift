@@ -10,70 +10,130 @@ struct RecordingView: View {
     @StateObject private var cameraManager = CameraManager()
     @State private var showingRetakeAlert = false
     @State private var hasAttemptedRecording = false
+    @State private var recordedVideoURL: URL?
+    @State private var showSaveButton = false
+    @State private var isFrontCamera = true
+    
+    private let maxRecordingDuration: TimeInterval = 600 // 10 minutes
     
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            // Full screen camera preview at back
+            ZStack {
+                Color.black
+                CameraPreviewView(cameraManager: cameraManager)
+            }
+            .ignoresSafeArea()
+            .onAppear {
+                cameraManager.updatePreviewFrame()
+            }
             
+            // UI Overlay
             VStack {
-                // Header
+                // Header with duration counter
                 HStack {
                     Button("Cancel") {
                         dismiss()
                     }
                     .foregroundColor(.white)
+                    .font(.system(size: 17, weight: .semibold))
                     
                     Spacer()
                     
-                    if appState.oneTakeMode && hasAttemptedRecording {
-                        Text("One Take Mode")
-                            .font(.caption)
-                            .foregroundColor(.orange)
+                    // Duration counter with subtle animation
+                    if videoManager.isRecording || hasAttemptedRecording {
+                        Text("\(formatTime(videoManager.recordingDuration)) / \(formatTime(maxRecordingDuration))")
+                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(8)
+                            .contentTransition(.numericText(countsDown: false))
+                            .animation(.easeInOut(duration: 0.15), value: videoManager.recordingDuration)
+                    }
+                    
+                    Spacer()
+                    
+                    // Camera flip button
+                    if !videoManager.isRecording && !showSaveButton {
+                        Button(action: flipCamera) {
+                            Image(systemName: "camera.rotate.fill")
+                                .font(.system(size: 22))
+                                .foregroundColor(.white)
+                                .frame(width: 44, height: 44)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
+                    } else {
+                        // Spacer for balance when button hidden
+                        Color.clear.frame(width: 44, height: 44)
                     }
                 }
-                .padding()
-                
-                // Camera Preview
-                CameraPreviewView(cameraManager: cameraManager)
-                    .aspectRatio(9/16, contentMode: .fit)
-                    .cornerRadius(16)
-                    .padding(.horizontal)
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
                 
                 Spacer()
                 
                 // Recording Controls
                 VStack(spacing: 20) {
-                    // Timer
-                    if videoManager.isRecording {
-                        Text(formatTime(videoManager.recordingDuration))
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                    }
-                    
-                    // Record Button
-                    Button(action: toggleRecording) {
-                        ZStack {
-                            Circle()
-                                .fill(videoManager.isRecording ? Color.red : Color.white)
-                                .frame(width: 80, height: 80)
+                    // Show Save Button after recording
+                    if showSaveButton, let url = recordedVideoURL {
+                        VStack(spacing: 16) {
+                            Text("Recording Complete")
+                                .font(.headline)
+                                .foregroundColor(.white)
                             
-                            if videoManager.isRecording {
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(Color.white)
-                                    .frame(width: 24, height: 24)
+                            Button(action: {
+                                videoManager.saveVideo(url: url)
+                                streakManager.recordVideo()
+                                dismiss()
+                            }) {
+                                Text("Add Video Entry")
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                                    .padding(.horizontal, 40)
+                                    .padding(.vertical, 16)
+                                    .background(Color.white)
+                                    .cornerRadius(12)
+                            }
+                            
+                            Button(action: {
+                                // Retake - reset and go again
+                                showSaveButton = false
+                                recordedVideoURL = nil
+                                hasAttemptedRecording = false
+                            }) {
+                                Text("Retake")
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
                             }
                         }
+                    } else {
+                        // Record Button
+                        Button(action: toggleRecording) {
+                            ZStack {
+                                Circle()
+                                    .fill(videoManager.isRecording ? Color.red : Color.white)
+                                    .frame(width: 80, height: 80)
+                                
+                                if videoManager.isRecording {
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(Color.white)
+                                        .frame(width: 24, height: 24)
+                                }
+                            }
+                        }
+                        .disabled(appState.oneTakeMode && hasAttemptedRecording && !videoManager.isRecording)
+                        .opacity((appState.oneTakeMode && hasAttemptedRecording && !videoManager.isRecording) ? 0.5 : 1.0)
+                        
+                        // Instructions
+                        Text(getInstructionText())
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
                     }
-                    .disabled(appState.oneTakeMode && hasAttemptedRecording && !videoManager.isRecording)
-                    .opacity((appState.oneTakeMode && hasAttemptedRecording && !videoManager.isRecording) ? 0.5 : 1.0)
-                    
-                    // Instructions
-                    Text(getInstructionText())
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
                 }
                 .padding(.bottom, 40)
             }
@@ -96,8 +156,8 @@ struct RecordingView: View {
             videoManager.stopRecording()
             cameraManager.stopRecording { url in
                 if let url = url {
-                    videoManager.saveVideo(url: url)
-                    streakManager.recordVideo()
+                    recordedVideoURL = url
+                    showSaveButton = true
                     
                     if appState.oneTakeMode {
                         showingRetakeAlert = true
@@ -111,8 +171,13 @@ struct RecordingView: View {
             
             hasAttemptedRecording = true
             videoManager.startRecording()
-            cameraManager.startRecording()
+            cameraManager.startRecording(maxDuration: maxRecordingDuration)
         }
+    }
+    
+    private func flipCamera() {
+        isFrontCamera.toggle()
+        cameraManager.switchCamera(toFront: isFrontCamera)
     }
     
     private func saveAndExit() {
@@ -143,7 +208,9 @@ struct CameraPreviewView: UIViewRepresentable {
         return cameraManager.previewView
     }
     
-    func updateUIView(_ uiView: UIView, context: Context) {}
+    func updateUIView(_ uiView: UIView, context: Context) {
+        cameraManager.updatePreviewFrame()
+    }
 }
 
 class CameraManager: NSObject, ObservableObject {
@@ -153,26 +220,33 @@ class CameraManager: NSObject, ObservableObject {
     private var previewLayer: AVCaptureVideoPreviewLayer?
     private var completionHandler: ((URL?) -> Void)?
     
-    func setupCamera() {
+    private var currentVideoInput: AVCaptureDeviceInput?
+    
+    func setupCamera(useFront: Bool = true) {
         captureSession = AVCaptureSession()
         
         guard let captureSession = captureSession else { return }
         
         captureSession.beginConfiguration()
         
-        // Add video input
-        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front),
-              let videoInput = try? AVCaptureDeviceInput(device: videoDevice) else { return }
+        // Add video input (front camera default)
+        let position: AVCaptureDevice.Position = useFront ? .front : .back
+        let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position)
+            ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: useFront ? .back : .front)
+        
+        guard let device = videoDevice,
+              let videoInput = try? AVCaptureDeviceInput(device: device) else { return }
+        
+        currentVideoInput = videoInput
         
         if captureSession.canAddInput(videoInput) {
             captureSession.addInput(videoInput)
         }
         
         // Add audio input
-        guard let audioDevice = AVCaptureDevice.default(for: .audio),
-              let audioInput = try? AVCaptureDeviceInput(device: audioDevice) else { return }
-        
-        if captureSession.canAddInput(audioInput) {
+        if let audioDevice = AVCaptureDevice.default(for: .audio),
+           let audioInput = try? AVCaptureDeviceInput(device: audioDevice),
+           captureSession.canAddInput(audioInput) {
             captureSession.addInput(audioInput)
         }
         
@@ -198,8 +272,44 @@ class CameraManager: NSObject, ObservableObject {
         }
     }
     
-    func startRecording() {
+    func switchCamera(toFront: Bool) {
+        guard let captureSession = captureSession else { return }
+        
+        captureSession.beginConfiguration()
+        
+        // Remove existing video input
+        if let currentInput = currentVideoInput {
+            captureSession.removeInput(currentInput)
+        }
+        
+        // Add new video input
+        let position: AVCaptureDevice.Position = toFront ? .front : .back
+        let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position)
+            ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: toFront ? .back : .front)
+        
+        guard let device = videoDevice,
+              let videoInput = try? AVCaptureDeviceInput(device: device),
+              captureSession.canAddInput(videoInput) else {
+            captureSession.commitConfiguration()
+            return
+        }
+        
+        currentVideoInput = videoInput
+        captureSession.addInput(videoInput)
+        captureSession.commitConfiguration()
+    }
+    
+    func updatePreviewFrame() {
+        DispatchQueue.main.async {
+            self.previewLayer?.frame = self.previewView.bounds
+        }
+    }
+    
+    func startRecording(maxDuration: TimeInterval) {
         guard let videoOutput = videoOutput else { return }
+        
+        // Set max duration
+        videoOutput.maxRecordedDuration = CMTime(seconds: maxDuration, preferredTimescale: 1)
         
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
