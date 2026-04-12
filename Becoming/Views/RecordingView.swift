@@ -9,8 +9,6 @@ struct RecordingView: View {
     @EnvironmentObject var appState: AppState
     
     @StateObject private var cameraManager = CameraManager()
-    @State private var showingRetakeAlert = false
-    @State private var hasAttemptedRecording = false
     @State private var recordedVideoURL: URL?
     @State private var showSaveButton = false
     @State private var isFrontCamera = true
@@ -25,6 +23,10 @@ struct RecordingView: View {
                 CameraPreviewView(cameraManager: cameraManager)
             }
             .ignoresSafeArea()
+            .onTapGesture(count: 2) {
+                HapticManager.shared.medium()
+                flipCamera()
+            }
             .onAppear {
                 cameraManager.updatePreviewFrame()
             }
@@ -33,18 +35,18 @@ struct RecordingView: View {
             VStack {
                 // Header with duration counter
                 HStack {
-                    Button("Cancel") {
-                        let impact = UIImpactFeedbackGenerator(style: .light)
-                        impact.impactOccurred()
-                        dismiss()
-                    }
-                    .foregroundColor(.white)
-                    .font(.system(size: 17, weight: .semibold))
+                    // Button("Cancel") {
+                    //     let impact = UIImpactFeedbackGenerator(style: .light)
+                    //     impact.impactOccurred()
+                    //     dismiss()
+                    // }
+                    // .foregroundColor(.white)
+                    // .font(.system(size: 17, weight: .semibold))
                     
                     Spacer()
                     
                     // Duration counter with subtle animation
-                    if videoManager.isRecording || hasAttemptedRecording {
+                    if videoManager.isRecording || showSaveButton {
                         Text("\(formatTime(videoManager.recordingDuration)) / \(formatTime(maxRecordingDuration))")
                             .font(.system(size: 15, weight: .semibold, design: .rounded))
                             .foregroundColor(.white)
@@ -59,23 +61,23 @@ struct RecordingView: View {
                     Spacer()
                     
                     // Camera flip button
-                    if !videoManager.isRecording && !showSaveButton {
-                        Button(action: {
-                            let impact = UIImpactFeedbackGenerator(style: .light)
-                            impact.impactOccurred()
-                            flipCamera()
-                        }) {
-                            Image(systemName: "camera.rotate.fill")
-                                .font(.system(size: 22))
-                                .foregroundColor(.white)
-                                .frame(width: 44, height: 44)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Circle())
-                        }
-                    } else {
-                        // Spacer for balance when button hidden
-                        Color.clear.frame(width: 44, height: 44)
-                    }
+                    // if !videoManager.isRecording && !showSaveButton {
+                    //     Button(action: {
+                    //         let impact = UIImpactFeedbackGenerator(style: .light)
+                    //         impact.impactOccurred()
+                    //         flipCamera()
+                    //     }) {
+                    //         Image(systemName: "camera.rotate.fill")
+                    //             .font(.system(size: 22))
+                    //             .foregroundColor(.white)
+                    //             .frame(width: 44, height: 44)
+                    //             .background(.ultraThinMaterial)
+                    //             .clipShape(Circle())
+                    //     }
+                    // } else {
+                    //     // Spacer for balance when button hidden
+                    //     Color.clear.frame(width: 44, height: 44)
+                    // }
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
@@ -84,85 +86,98 @@ struct RecordingView: View {
                 
                 // Recording Controls
                 VStack(spacing: 20) {
-                    // Show Save Button after recording
-                    if showSaveButton, let url = recordedVideoURL {
-                        VStack(spacing: 16) {
-                            Text("Recording Complete")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            
-                            Button(action: {
-                                let impact = UIImpactFeedbackGenerator(style: .medium)
-                                impact.impactOccurred()
-                                videoManager.saveVideo(url: url)
-                                streakManager.recordVideo()
-                                dismiss()
-                            }) {
-                                Text("Add Video Entry")
-                                    .font(.headline)
-                                    .foregroundColor(.black)
-                                    .padding(.horizontal, 40)
-                                    .padding(.vertical, 16)
-                                    .background(Color.white)
-                                    .cornerRadius(12)
-                            }
-                            
-                            Button(action: {
-                                let impact = UIImpactFeedbackGenerator(style: .light)
-                                impact.impactOccurred()
-                                // Retake - reset and go again
-                                showSaveButton = false
-                                recordedVideoURL = nil
-                                hasAttemptedRecording = false
-                            }) {
-                                Text("Retake")
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                    } else {
-                        // Record Button
-                        Button(action: {
-                            let impact = UIImpactFeedbackGenerator(style: videoManager.isRecording ? .rigid : .medium)
-                            impact.impactOccurred()
-                            toggleRecording()
-                        }) {
-                            ZStack {
-                                Circle()
-                                    .fill(videoManager.isRecording ? Color.red : Color.white)
-                                    .frame(width: 80, height: 80)
+                    // Recording Controls with animated blur
+                    ZStack {
+                        // Save/Confirm State
+                        if showSaveButton, let url = recordedVideoURL {
+                            HStack {
+                                // Redo button on the left
+                                Button(action: {
+                                    HapticManager.shared.light()
+                                    showSaveButton = false
+                                    recordedVideoURL = nil
+                                }) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(.ultraThinMaterial)
+                                            .frame(width: 56, height: 56)
+                                        
+                                        Image(systemName: "arrow.counterclockwise")
+                                            .font(.system(size: 22, weight: .semibold))
+                                            .foregroundColor(.white)
+                                    }
+                                }
                                 
-                                if videoManager.isRecording {
-                                    RoundedRectangle(cornerRadius: 4)
-                                        .fill(Color.white)
-                                        .frame(width: 24, height: 24)
+                                Spacer()
+                                
+                                // Checkmark save button in the center
+                                Button(action: {
+                                    HapticManager.shared.medium()
+                                    videoManager.saveVideo(url: url)
+                                    streakManager.recordVideo()
+                                    dismiss()
+                                }) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.white)
+                                            .frame(width: 80, height: 80)
+                                            .shadow(color: .white.opacity(0.5), radius: 12, x: 0, y: 2)
+                                        
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 32, weight: .bold))
+                                            .foregroundColor(.black)
+                                    }
+                                }
+                                
+                                Spacer()
+                                
+                                Color.clear.frame(width: 56, height: 56)
+                            }
+                            .padding(.horizontal, 32)
+                            .transition(.asymmetric(
+                                insertion: .opacity.combined(with: .scale(scale: 1.1)),
+                                removal: .opacity.combined(with: .scale(scale: 0.9))
+                            ))
+                        }
+                        
+                        // Record/Recording State
+                        if !showSaveButton {
+                            Button(action: {
+                                videoManager.isRecording ? HapticManager.shared.rigid() : HapticManager.shared.medium()
+                                toggleRecording()
+                            }) {
+                                ZStack {
+                                    Circle()
+                                        .fill(videoManager.isRecording ? Color.red : Color.white)
+                                        .frame(width: 80, height: 80)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.white.opacity(0.3), lineWidth: videoManager.isRecording ? 0 : 2)
+                                        )
+                                    
+                                    if videoManager.isRecording {
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(Color.white)
+                                            .frame(width: 24, height: 24)
+                                    }
                                 }
                             }
+                            .transition(.asymmetric(
+                                insertion: .opacity.combined(with: .scale(scale: 1.1)),
+                                removal: .opacity.combined(with: .scale(scale: 0.9))
+                            ))
                         }
-                        .disabled(appState.oneTakeMode && hasAttemptedRecording && !videoManager.isRecording)
-                        .opacity((appState.oneTakeMode && hasAttemptedRecording && !videoManager.isRecording) ? 0.5 : 1.0)
-                        
-                        // Instructions
-                        Text(getInstructionText())
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
                     }
+                    .animation(.spring(response: 0.5, dampingFraction: 0.8, blendDuration: 0.3), value: showSaveButton)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: videoManager.isRecording)
                 }
                 .padding(.bottom, 40)
             }
         }
         .onAppear {
             cameraManager.setupCamera()
-        }
-        .alert("One Take Mode", isPresented: $showingRetakeAlert) {
-            Button("Keep Recording", role: .cancel) { }
-            Button("Save & Exit") {
-                saveAndExit()
-            }
-        } message: {
-            Text("You can only record once in One Take Mode. Save this recording or keep going?")
+            // Preemptively prepare haptic generators
+            HapticManager.shared.prepareMedium()
         }
     }
     
@@ -170,21 +185,14 @@ struct RecordingView: View {
         if videoManager.isRecording {
             videoManager.stopRecording()
             cameraManager.stopRecording { url in
-                if let url = url {
-                    recordedVideoURL = url
-                    showSaveButton = true
-                    
-                    if appState.oneTakeMode {
-                        showingRetakeAlert = true
+                DispatchQueue.main.async {
+                    if let url = url {
+                        recordedVideoURL = url
+                        showSaveButton = true
                     }
                 }
             }
         } else {
-            if appState.oneTakeMode && hasAttemptedRecording {
-                return // Can't record again in one take mode
-            }
-            
-            hasAttemptedRecording = true
             videoManager.startRecording()
             cameraManager.startRecording(maxDuration: maxRecordingDuration)
         }
@@ -197,16 +205,6 @@ struct RecordingView: View {
     
     private func saveAndExit() {
         dismiss()
-    }
-    
-    private func getInstructionText() -> String {
-        if appState.oneTakeMode && hasAttemptedRecording && !videoManager.isRecording {
-            return "One take complete. Tap 'Save & Exit' to finish."
-        } else if videoManager.isRecording {
-            return "Recording... Tap to stop (max 10 minutes)"
-        } else {
-            return "Tap to start recording your daily log"
-        }
     }
     
     private func formatTime(_ seconds: TimeInterval) -> String {

@@ -1,8 +1,10 @@
 import SwiftUI
 import UIKit
+import AVKit
 
 struct CalendarTimelineView: View {
     @EnvironmentObject var videoManager: VideoManager
+    @EnvironmentObject var appState: AppState
     @Binding var selectedDate: Date
     @State private var showingVideoPlayer = false
     @State private var selectedVideo: VideoEntry?
@@ -34,17 +36,16 @@ struct CalendarTimelineView: View {
                         selectedDate: $selectedDate,
                         videoManager: videoManager,
                         onVideoTap: { video in
-                            let impact = UIImpactFeedbackGenerator(style: .medium)
-                            impact.impactOccurred()
+                            HapticManager.shared.medium()
                             selectedVideo = video
                             showingVideoPlayer = true
                         }
                     )
+                    .environmentObject(appState)
                     .tag(offset)
                 }
                 .onChange(of: currentMonthIndex) { _ in
-                    let impact = UIImpactFeedbackGenerator(style: .soft)
-                    impact.impactOccurred()
+                    HapticManager.shared.soft()
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
@@ -52,6 +53,9 @@ struct CalendarTimelineView: View {
         }
         .onAppear {
             currentMonthIndex = 0
+            // Preemptively prepare haptic generators
+            HapticManager.shared.prepareLight()
+            HapticManager.shared.prepareSoft()
         }
         .onChange(of: currentMonthIndex) { newIndex in
             // Update selected date to the first day of the new month
@@ -80,6 +84,7 @@ struct MonthGridView: View {
     let videoManager: VideoManager
     let onVideoTap: (VideoEntry) -> Void
     
+    @EnvironmentObject var appState: AppState
     private let calendar = Calendar.current
     
     private var monthDate: Date {
@@ -128,13 +133,13 @@ struct MonthGridView: View {
                     isToday: calendar.isDateInToday(date),
                     isSelected: calendar.isDate(date, inSameDayAs: selectedDate)
                 ) {
-                    let impact = UIImpactFeedbackGenerator(style: .light)
-                    impact.impactOccurred()
+                    HapticManager.shared.light()
                     selectedDate = date
                     if let video = video {
                         onVideoTap(video)
                     }
                 }
+                .environmentObject(appState)
             }
         }
         .padding(.horizontal, 20)
@@ -154,6 +159,7 @@ struct CalendarDayView: View {
     let isSelected: Bool
     let onTap: () -> Void
     
+    @EnvironmentObject var appState: AppState
     @State private var isPressed = false
     
     private var hasVideo: Bool { video != nil }
@@ -185,7 +191,7 @@ struct CalendarDayView: View {
                         .opacity(isCurrentMonth ? 1.0 : 0.5)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                                .stroke(isSelected ? appState.accentColor.swiftUIColor : Color.clear, lineWidth: 2)
                         )
                 } else {
                     // Day number (shown when no thumbnail)
@@ -201,7 +207,7 @@ struct CalendarDayView: View {
                     VStack {
                         Spacer()
                         Circle()
-                            .fill(Color.blue)
+                            .fill(appState.accentColor.swiftUIColor)
                             .frame(width: 6, height: 6)
                             .padding(.bottom, 6)
                     }
@@ -243,7 +249,7 @@ struct CalendarDayView: View {
     
     private var backgroundColor: Color {
         if isSelected && video?.thumbnailURL == nil {
-            return Color.blue.opacity(0.3)
+            return appState.accentColor.swiftUIColor.opacity(0.3)
         } else if isToday && video?.thumbnailURL == nil {
             return Color.white.opacity(0.2)
         } else if hasVideo && video?.thumbnailURL == nil {
@@ -265,6 +271,45 @@ struct CalendarDayView: View {
         } else {
             return Color.gray
         }
+    }
+}
+
+struct VideoPlayerView: View {
+    let videoURL: URL
+    let entry: VideoEntry
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color(red: 0.06, green: 0.06, blue: 0.06).ignoresSafeArea()
+                
+                VideoPlayer(player: AVPlayer(url: videoURL))
+                    .edgesIgnoringSafeArea(.all)
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .foregroundColor(.white)
+                }
+                
+                ToolbarItem(placement: .principal) {
+                    Text(formattedDate(entry.date))
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.white)
+                }
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+    
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: date)
     }
 }
 

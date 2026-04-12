@@ -5,7 +5,7 @@ import UIKit
 
 class VideoManager: ObservableObject {
     @Published var videoEntries: [VideoEntry] = []
-    @Published var isRecording = false
+    @Published var isRecording: Bool = false
     @Published var recordingDuration: TimeInterval = 0
     
     private let maxRecordingDuration: TimeInterval = 600 // 10 minutes
@@ -43,13 +43,14 @@ class VideoManager: ObservableObject {
             try FileManager.default.copyItem(at: url, to: destinationURL)
             
             // Generate thumbnail
-            let thumbnailURL = generateThumbnail(for: destinationURL, timestamp: timestamp)
+            let thumbnailFilename = generateThumbnail(for: destinationURL, timestamp: timestamp)
             
+            // Create VideoEntry with relative paths (filenames only)
             let videoEntry = VideoEntry(
                 date: Date(),
-                videoURL: destinationURL,
+                videoFilename: fileName,
                 duration: recordingDuration,
-                thumbnailURL: thumbnailURL
+                thumbnailFilename: thumbnailFilename
             )
             
             videoEntries.insert(videoEntry, at: 0)
@@ -60,24 +61,24 @@ class VideoManager: ObservableObject {
         }
     }
     
-    private func generateThumbnail(for videoURL: URL, timestamp: TimeInterval) -> URL? {
+    private func generateThumbnail(for videoURL: URL, timestamp: TimeInterval) -> String? {
         let asset = AVAsset(url: videoURL)
         let imageGenerator = AVAssetImageGenerator(asset: asset)
         imageGenerator.appliesPreferredTrackTransform = true
         
-        let time = CMTime(seconds: 1, preferredTimescale: 60) // 1 second in
+        let time = CMTime(seconds: 1, preferredTimescale: 60)
         
         do {
             let cgImage = try imageGenerator.copyCGImage(at: time, actualTime: nil)
             let image = UIImage(cgImage: cgImage)
             
-            // Save thumbnail
+            let filename = "thumb_\(timestamp).jpg"
             let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            let thumbnailURL = documentsPath.appendingPathComponent("thumb_\(timestamp).jpg")
+            let thumbnailURL = documentsPath.appendingPathComponent(filename)
             
             if let data = image.jpegData(compressionQuality: 0.7) {
                 try data.write(to: thumbnailURL)
-                return thumbnailURL
+                return filename
             }
         } catch {
             print("Error generating thumbnail: \(error)")
@@ -121,8 +122,12 @@ class VideoManager: ObservableObject {
         if let index = videoEntries.firstIndex(where: { $0.id == entry.id }) {
             videoEntries.remove(at: index)
             
-            // Delete the actual file
-            try? FileManager.default.removeItem(at: entry.videoURL)
+            // Delete the actual files
+            let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            try? FileManager.default.removeItem(at: documentsPath.appendingPathComponent(entry.videoFilename))
+            if let thumbnailFilename = entry.thumbnailFilename {
+                try? FileManager.default.removeItem(at: documentsPath.appendingPathComponent(thumbnailFilename))
+            }
             
             saveVideoEntries()
         }

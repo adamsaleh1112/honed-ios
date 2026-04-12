@@ -16,8 +16,6 @@ struct OnboardingView: View {
                     WelcomeStep()
                 case 1:
                     NotificationStep()
-                case 2:
-                    OneTakeModeStep()
                 default:
                     CompletionStep()
                 }
@@ -25,7 +23,7 @@ struct OnboardingView: View {
                 Spacer()
                 
                 Button(action: nextStep) {
-                    Text(currentStep == 3 ? "Start your journey" : "Continue")
+                    Text(currentStep == 2 ? "Start your journey" : "Continue")
                         .font(.system(size: 18, weight: .medium))
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
@@ -75,31 +73,6 @@ struct OnboardingView: View {
     }
     
     @ViewBuilder
-    private func OneTakeModeStep() -> some View {
-        VStack(spacing: 30) {
-            Text("One take mode")
-                .font(.system(size: 32, weight: .medium))
-                .foregroundColor(.white)
-            
-            Text("Force authenticity by limiting retakes")
-                .font(.system(size: 20))
-                .foregroundColor(.gray)
-                .multilineTextAlignment(.center)
-            
-            VStack(spacing: 20) {
-                Toggle("Enable one take mode", isOn: $appState.oneTakeMode)
-                    .font(.system(size: 18))
-                    .foregroundColor(.white)
-                
-                Text("When enabled, you only get one attempt to record. This reduces perfectionism and keeps your logs authentic.")
-                    .font(.system(size: 16))
-                    .foregroundColor(.gray)
-                    .multilineTextAlignment(.center)
-            }
-        }
-    }
-    
-    @ViewBuilder
     private func CompletionStep() -> some View {
         VStack(spacing: 30) {
             Text("You're ready!")
@@ -126,15 +99,14 @@ struct OnboardingView: View {
     }
     
     private func nextStep() {
-        if currentStep < 3 {
+        if currentStep < 2 {
             withAnimation {
                 currentStep += 1
             }
         } else {
             // Complete onboarding
-            appState.notificationTime = selectedTime
-            notificationManager.scheduleDailyNotification(at: selectedTime, streak: 0)
-            appState.completeOnboarding()
+            appState.isOnboarded = true
+            appState.saveUserDefaults()
         }
     }
 }

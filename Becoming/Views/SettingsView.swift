@@ -16,6 +16,10 @@ struct SettingsView: View {
                         SettingsSection(title: "Profile") {
                             VStack(spacing: 16) {
                                 HStack {
+                                    Image(systemName: "person")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.gray)
+                                        .frame(width: 28)
                                     Text("Your name")
                                         .font(.system(size: 16))
                                         .foregroundColor(.white)
@@ -32,9 +36,47 @@ struct SettingsView: View {
                         // Appearance Settings
                         SettingsSection(title: "Appearance") {
                             VStack(spacing: 16) {
-                                Toggle("Dark mode", isOn: $appState.isDarkMode)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white)
+                                HStack {
+                                    Image(systemName: "moon.fill")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.gray)
+                                        .frame(width: 28)
+                                    Toggle("Dark mode", isOn: $appState.isDarkMode)
+                                        .font(.system(size: 16))
+                                        .foregroundColor(.white)
+                                }
+                                HStack {
+                                    Image(systemName: "textformat")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.gray)
+                                        .frame(width: 28)
+                                    Toggle("Lowercase text", isOn: $appState.isLowercaseMode)
+                                        .font(.system(size: 16))
+                                        .foregroundColor(.white)
+                                }
+                                HStack {
+                                    Image(systemName: "paintpalette")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.gray)
+                                        .frame(width: 28)
+                                    Text("Accent color")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(.white)
+                                    Spacer()
+                                    Picker("Accent Color", selection: $appState.accentColor) {
+                                        ForEach(AccentColorOption.allCases, id: \.self) { color in
+                                            HStack {
+                                                Circle()
+                                                    .fill(color.swiftUIColor)
+                                                    .frame(width: 12, height: 12)
+                                                Text(color.rawValue)
+                                            }
+                                            .tag(color)
+                                        }
+                                    }
+                                    .pickerStyle(.menu)
+                                    .tint(appState.accentColor.swiftUIColor)
+                                }
                             }
                         }
                         
@@ -42,6 +84,10 @@ struct SettingsView: View {
                         SettingsSection(title: "Notifications") {
                             VStack(spacing: 16) {
                                 HStack {
+                                    Image(systemName: "clock")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.gray)
+                                        .frame(width: 28)
                                     Text("Daily reminder")
                                         .font(.system(size: 16))
                                         .foregroundColor(.white)
@@ -50,42 +96,82 @@ struct SettingsView: View {
                                         .labelsHidden()
                                         .colorScheme(.dark)
                                 }
-                                
-                                Toggle("One take mode", isOn: $appState.oneTakeMode)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white)
                             }
                         }
                         
                         // Stats Section
                         SettingsSection(title: "Your journey") {
                             VStack(spacing: 16) {
-                                StatRow(label: "Current streak", value: "\(streakManager.currentStreak) days")
-                                StatRow(label: "Longest streak", value: "\(streakManager.longestStreak) days")
-                                StatRow(label: "Consistency tier", value: streakManager.consistencyTier)
+                                HStack {
+                                    Image(systemName: "flame.fill")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.orange)
+                                        .frame(width: 28)
+                                    StatRow(label: "Current streak", value: "\(streakManager.currentStreak) days")
+                                }
+                                HStack {
+                                    Image(systemName: "trophy.fill")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.yellow)
+                                        .frame(width: 28)
+                                    StatRow(label: "Longest streak", value: "\(streakManager.longestStreak) days")
+                                }
+                                HStack {
+                                    Image(systemName: "star.fill")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.blue)
+                                        .frame(width: 28)
+                                    StatRow(label: "Consistency tier", value: streakManager.consistencyTier)
+                                }
                             }
                         }
                         
                         // About Section
                         SettingsSection(title: "About") {
                             VStack(spacing: 16) {
-                                InfoRow(label: "Version", value: "1.0.0")
-                                InfoRow(label: "Build", value: "1")
+                                HStack {
+                                    Image(systemName: "info.circle")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.gray)
+                                        .frame(width: 28)
+                                    InfoRow(label: "Version", value: "1.0.0")
+                                }
+                                HStack {
+                                    Image(systemName: "number")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.gray)
+                                        .frame(width: 28)
+                                    InfoRow(label: "Build", value: "1")
+                                }
                             }
                         }
                         
                         // Reset Section
                         SettingsSection(title: "Reset") {
                             VStack(spacing: 16) {
-                                Button("Reset Streak") {
-                                    resetStreak()
+                                HStack {
+                                    Image(systemName: "arrow.counterclockwise")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.red)
+                                        .frame(width: 28)
+                                    Button("Reset Streak") {
+                                        resetStreak()
+                                    }
+                                    .foregroundColor(.red)
+                                    Spacer()
                                 }
-                                .foregroundColor(.red)
                                 
-                                Button("Reset All Data") {
-                                    resetAllData()
+                                HStack {
+                                    Image(systemName: "trash")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.red)
+                                        .frame(width: 28)
+                                    Button("Reset All Data") {
+                                        resetAllData()
+                                    }
+                                    .foregroundColor(.red)
+                                    Spacer()
                                 }
-                                .foregroundColor(.red)
                             }
                         }
                     }
@@ -107,7 +193,10 @@ struct SettingsView: View {
         .onChange(of: appState.isDarkMode) { _ in
             appState.saveUserDefaults()
         }
-        .onChange(of: appState.oneTakeMode) { _ in
+        .onChange(of: appState.isLowercaseMode) { _ in
+            appState.saveUserDefaults()
+        }
+        .onChange(of: appState.accentColor) { _ in
             appState.saveUserDefaults()
         }
     }
@@ -126,7 +215,6 @@ struct SettingsView: View {
         defaults.removeObject(forKey: "longestStreak")
         defaults.removeObject(forKey: "lastRecordingDate")
         defaults.removeObject(forKey: "notificationTime")
-        defaults.removeObject(forKey: "oneTakeMode")
         defaults.removeObject(forKey: "videoEntries")
         
         // Reset app state

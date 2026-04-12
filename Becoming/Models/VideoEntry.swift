@@ -3,16 +3,25 @@ import Foundation
 struct VideoEntry: Identifiable, Codable {
     let id: UUID
     let date: Date
-    let videoURL: URL
+    let videoFilename: String
     let duration: TimeInterval
-    let thumbnailURL: URL?
+    let thumbnailFilename: String?
     
-    init(date: Date, videoURL: URL, duration: TimeInterval, thumbnailURL: URL? = nil) {
-        self.id = UUID()
+    init(id: UUID? = nil, date: Date, videoFilename: String, duration: TimeInterval, thumbnailFilename: String? = nil) {
+        self.id = id ?? UUID()
         self.date = date
-        self.videoURL = videoURL
+        self.videoFilename = videoFilename
         self.duration = duration
-        self.thumbnailURL = thumbnailURL
+        self.thumbnailFilename = thumbnailFilename
+    }
+    
+    // Computed property to get full URL from filename
+    var videoURL: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(videoFilename)
+    }
+    
+    var thumbnailURL: URL? {
+        thumbnailFilename.map { FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent($0) }
     }
     
     var daysSinceRecording: Int {

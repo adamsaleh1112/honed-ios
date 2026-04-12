@@ -69,6 +69,11 @@ struct HomeContentView: View {
                 Spacer()
             }
         }
+        .onAppear {
+            // Re-prepare haptics when returning to Home tab
+            HapticManager.shared.prepareLight()
+            HapticManager.shared.prepareSoft()
+        }
     }
 }
 
@@ -138,8 +143,7 @@ struct FloatingRecordButton: View {
     
     var body: some View {
         Button(action: {
-            let impact = UIImpactFeedbackGenerator(style: .medium)
-            impact.impactOccurred()
+            HapticManager.shared.medium()
             // Trigger action with subtle animation
             withAnimation(.spring(response: 0.3, dampingFraction: 0.8, blendDuration: 0)) {
                 action()
