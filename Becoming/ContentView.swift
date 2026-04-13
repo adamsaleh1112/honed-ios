@@ -399,7 +399,7 @@ struct EntryStatusView: View {
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(appState.theme.textPrimary)
 
-                    Text("Entry recorded".lowercased(if: appState.isLowercaseMode))
+                    Text(appState.isLowercaseMode ? "Entry recorded".lowercased() : "Entry recorded")
                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                         .foregroundColor(appState.theme.textPrimary)
                 } else {
@@ -407,7 +407,7 @@ struct EntryStatusView: View {
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(appState.theme.textSecondary)
 
-                    Text("No entry today".lowercased(if: appState.isLowercaseMode))
+                    Text(appState.isLowercaseMode ? "No entry today".lowercased() : "No entry today")
                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                         .foregroundColor(appState.theme.textSecondary)
                 }
@@ -430,6 +430,7 @@ struct EntryStatusView: View {
 struct VideoPreviewPopup: View {
     let video: VideoEntry
     let onPlay: () -> Void
+    @EnvironmentObject var appState: AppState
     
     private var formattedDate: String {
         let formatter = DateFormatter()
@@ -482,7 +483,7 @@ struct VideoPreviewPopup: View {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(alignment: .top) {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(formattedDate.lowercased(if: appState.isLowercaseMode))
+                                Text(appState.isLowercaseMode ? formattedDate.lowercased() : formattedDate)
                                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                                     .foregroundColor(.white)
                                 
@@ -549,6 +550,7 @@ struct VideoPlayerView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var player: AVPlayer?
     @State private var isLoading = true
+    @EnvironmentObject var appState: AppState
     
     var body: some View {
         NavigationView {
@@ -567,7 +569,7 @@ struct VideoPlayerView: View {
                         ProgressView()
                             .scaleEffect(1.5)
                             .tint(.white)
-                        Text("Loading video...".lowercased(if: appState.isLowercaseMode))
+                        Text(appState.isLowercaseMode ? "Loading video...".lowercased() : "Loading video...")
                             .foregroundColor(.gray)
                     }
                 }
@@ -575,7 +577,7 @@ struct VideoPlayerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done".lowercased(if: appState.isLowercaseMode)) {
+                    Button(appState.isLowercaseMode ? "Done".lowercased() : "Done") {
                         player?.pause()
                         dismiss()
                     }
@@ -639,6 +641,7 @@ struct VideoPlayerView: View {
 struct StreakPopup: View {
     let onClose: () -> Void
     @EnvironmentObject var streakManager: StreakManager
+    @EnvironmentObject var appState: AppState
     @State private var glintOffset: CGFloat = -400
     
     private var streakColor: Color {
@@ -656,7 +659,7 @@ struct StreakPopup: View {
     
     var body: some View {
         VStack(spacing: 24) {
-            Text("Your current streak is".lowercased(if: appState.isLowercaseMode))
+            Text(appState.isLowercaseMode ? "Your current streak is".lowercased() : "Your current streak is")
                 .font(.system(size: 22, weight: .semibold, design: .rounded))
                 .foregroundColor(.white)
             
