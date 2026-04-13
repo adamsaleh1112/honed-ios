@@ -324,7 +324,7 @@ struct DateHeaderView: View {
             Spacer()
             
             // Day of week abbreviation (top right)
-            Text(dayAbbreviation)
+            Text(appState.isLowercaseMode ? dayAbbreviation.lowercased() : dayAbbreviation)
                 .font(.system(size: 26, weight: .medium))
                 .fontDesign(.rounded)
                 .foregroundColor(appState.theme.textMuted)
