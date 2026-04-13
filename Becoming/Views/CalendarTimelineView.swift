@@ -12,22 +12,22 @@ struct CalendarTimelineView: View {
     private let visibleMonthRange = -12...12 // Show 12 months back and forward
     
     // Cache day headers for performance
-    private let dayHeaders = ["S", "M", "T", "W", "T", "F", "S"]
+    private let dayHeaders = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
     
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 0) {
             // Day headers (fixed, not swiping)
             HStack {
                 ForEach(dayHeaders, id: \.self) { day in
                     Text(day)
-                        .font(.system(size: 14, weight: .medium, design: .rounded))
-                        .foregroundColor(.gray)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(Color.gray.opacity(0.5))
                         .frame(maxWidth: .infinity)
                         .frame(height: 14)
                 }
             }
             .padding(.horizontal, 20)
-            
+
             // Horizontal paging months
             TabView(selection: $currentMonthIndex) {
                 ForEach(Array(visibleMonthRange), id: \.self) { offset in
@@ -190,7 +190,7 @@ struct CalendarDayView: View {
                 } else {
                     // Day number (shown when no thumbnail)
                     Text(dayFormatter.string(from: date))
-                        .font(.system(size: 16, weight: hasVideo ? .bold : .medium, design: .rounded))
+                        .font(.system(size: 22, weight: hasVideo ? .bold : .medium, design: .rounded)) // CAL DAYS HERE
                         .foregroundColor(textColor)
                         .scaleEffect(isPressed ? 0.9 : 1.0)
                         .animation(.spring(response: 0.3, dampingFraction: 0.8, blendDuration: 0), value: isPressed)

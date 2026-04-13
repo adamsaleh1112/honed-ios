@@ -8,13 +8,22 @@ struct ContentView: View {
     @EnvironmentObject var streakManager: StreakManager
     
     var body: some View {
-        Group {
+        ZStack {
+            // Background color to fill any gaps during transition
+            Color(red: 0.06, green: 0.06, blue: 0.06)
+                .ignoresSafeArea()
+
             if !appState.isOnboarded {
                 OnboardingView()
+                    .transition(.blurReplace)
             } else {
                 MainView()
+                    .transition(.blurReplace)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
+        .animation(.easeInOut(duration: 0.6), value: appState.isOnboarded)
     }
 }
 
@@ -83,7 +92,15 @@ struct HomeContentView: View {
     @State private var showingVideoPlayer = false
     @State private var selectedVideo: VideoEntry?
     @State private var showingStreakPopup = false
-    
+
+    // Staggered animation states
+    @State private var headerOpacity = 0.0
+    @State private var headerOffset: CGFloat = -15
+    @State private var calendarOpacity = 0.0
+    @State private var calendarOffset: CGFloat = -15
+    @State private var bottomOpacity = 0.0
+    @State private var bottomOffset: CGFloat = -15
+
     var body: some View {
         ZStack {
             Color(red: 0.06, green: 0.06, blue: 0.06).ignoresSafeArea()
@@ -93,7 +110,20 @@ struct HomeContentView: View {
                 DateHeaderView(selectedDate: $selectedDate)
                     .padding(.horizontal, 24)
                     .padding(.top, 20)
-                
+                    .opacity(headerOpacity)
+                    .offset(y: headerOffset)
+
+                // Dotted line separator
+                HStack(spacing: 5.5) {
+                    ForEach(0..<42) { _ in
+                        Circle()
+                            .fill(Color.gray.opacity(0.15))
+                            .frame(width: 3, height: 3)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 8)
+
                 // Calendar Timeline - full width for seamless swiping
                 CalendarTimelineView(
                     selectedDate: $selectedDate,
@@ -104,6 +134,8 @@ struct HomeContentView: View {
                     }
                 )
                 .padding(.top, 16)
+                .opacity(calendarOpacity)
+                .offset(y: calendarOffset)
                 
                 Spacer()
                 
@@ -118,6 +150,8 @@ struct HomeContentView: View {
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 48)
+                .opacity(bottomOpacity)
+                .offset(y: bottomOffset)
             }
             
             // Video Preview Popup - over entire screen
@@ -184,6 +218,27 @@ struct HomeContentView: View {
             // Re-prepare haptics when returning to Home tab
             HapticManager.shared.prepareLight()
             HapticManager.shared.prepareSoft()
+
+            // Staggered fade-in animation
+            headerOpacity = 0
+            headerOffset = -15
+            calendarOpacity = 0
+            calendarOffset = -15
+            bottomOpacity = 0
+            bottomOffset = -15
+
+            withAnimation(.easeOut(duration: 0.4).delay(0.1)) {
+                headerOpacity = 1
+                headerOffset = 0
+            }
+            withAnimation(.easeOut(duration: 0.4).delay(0.25)) {
+                calendarOpacity = 1
+                calendarOffset = 0
+            }
+            withAnimation(.easeOut(duration: 0.4).delay(0.4)) {
+                bottomOpacity = 1
+                bottomOffset = 0
+            }
         }
     }
 }

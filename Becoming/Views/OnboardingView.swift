@@ -55,16 +55,32 @@ struct OnboardingView: View {
                 Button(action: nextStep) {
                     Text(buttonText)
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundColor(.black)
+                        .foregroundColor(currentStep == 3 ? .white : .black)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                         .background(
-                            RoundedRectangle(cornerRadius: 40)
-                                .fill(Color.white)
+                            Group {
+                                if currentStep == 3 {
+                                    RoundedRectangle(cornerRadius: 40)
+                                        .fill(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    Color(red: 0.051, green: 0.271, blue: 0.675), // #0D45AC
+                                                    Color(red: 0.922, green: 0.624, blue: 0.961)  // #EB9FF5
+                                                ]),
+                                                startPoint: .bottom,
+                                                endPoint: .top
+                                            )
+                                        )
+                                } else {
+                                    RoundedRectangle(cornerRadius: 40)
+                                        .fill(Color.white)
+                                }
+                            }
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 40)
-                                .stroke(Color.white.opacity(0.2), lineWidth: 8)
+                                .stroke(Color.white.opacity(0.2), lineWidth: 4)
                         )
                 }
                 .padding(.horizontal, 24)
