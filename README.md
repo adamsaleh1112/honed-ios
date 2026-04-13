@@ -1,6 +1,6 @@
 # Becoming
 
-**Talk to your future self.**
+~~A a nice little video diary~~ **Talk to your future self.**
 
 Becoming is a platform built to bring daily video journaling back to the center of personal growth.
 
