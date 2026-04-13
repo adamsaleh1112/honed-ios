@@ -275,9 +275,9 @@ struct CalendarDayView: View {
         if isSelected && video?.thumbnailURL == nil {
             return appState.accentColor.swiftUIColor.opacity(0.3)
         } else if isToday && video?.thumbnailURL == nil {
-            return Color.white.opacity(0.2)
+            return appState.theme.isDarkMode ? Color.white.opacity(0.2) : Color.black.opacity(0.1)
         } else if hasVideo && video?.thumbnailURL == nil {
-            return Color.white.opacity(0.1)
+            return appState.theme.isDarkMode ? Color.white.opacity(0.1) : Color.black.opacity(0.05)
         } else {
             return Color.clear
         }
@@ -287,13 +287,13 @@ struct CalendarDayView: View {
         if !isCurrentMonth {
             return Color.gray.opacity(0.5)
         } else if isSelected {
-            return Color.white
+            return appState.theme.textPrimary
         } else if isToday {
-            return Color.white
+            return appState.theme.textPrimary
         } else if hasVideo {
-            return Color.white
+            return appState.theme.textPrimary
         } else {
-            return Color.gray
+            return appState.theme.textSecondary
         }
     }
 }

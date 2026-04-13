@@ -15,7 +15,7 @@ struct BecomingApp: App {
                 .environmentObject(notificationManager)
                 .environmentObject(videoManager)
                 .environmentObject(streakManager)
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(appState.isDarkMode ? .dark : .light)
                 .onAppear {
                     setupApp()
                 }

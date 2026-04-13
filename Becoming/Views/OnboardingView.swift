@@ -7,10 +7,10 @@ struct OnboardingView: View {
     @State private var selectedTime = Date()
     @State private var currentStep = 0
     @State private var userName = ""
-    
+
     var body: some View {
         ZStack {
-            Color(red: 0.06, green: 0.06, blue: 0.06).ignoresSafeArea()
+            appState.theme.background.ignoresSafeArea()
             
             VStack(alignment: .center, spacing: 0) {
                 Spacer()

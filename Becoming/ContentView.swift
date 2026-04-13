@@ -10,7 +10,7 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             // Background color to fill any gaps during transition
-            Color(red: 0.06, green: 0.06, blue: 0.06)
+            appState.theme.background
                 .ignoresSafeArea()
 
             if !appState.isOnboarded {
@@ -28,6 +28,7 @@ struct ContentView: View {
 }
 
 struct MainView: View {
+    @EnvironmentObject var appState: AppState
     @EnvironmentObject var videoManager: VideoManager
     @EnvironmentObject var streakManager: StreakManager
     @State private var selectedDate = Date()
@@ -78,7 +79,7 @@ struct MainView: View {
                     HapticManager.shared.prepareLight()
                 }
         }
-        .tint(.white)
+        .tint(appState.theme.textPrimary)
     }
 }
 
@@ -103,8 +104,8 @@ struct HomeContentView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 0.06, green: 0.06, blue: 0.06).ignoresSafeArea()
-            
+            appState.theme.background.ignoresSafeArea()
+
             VStack(spacing: 0) {
                 // Date Header
                 DateHeaderView(selectedDate: $selectedDate)
@@ -117,7 +118,7 @@ struct HomeContentView: View {
                 HStack(spacing: 5.5) {
                     ForEach(0..<42) { _ in
                         Circle()
-                            .fill(Color.gray.opacity(0.15))
+                            .fill(appState.theme.dotColor)
                             .frame(width: 3, height: 3)
                     }
                 }
@@ -247,39 +248,39 @@ struct DateHeaderView: View {
     @Binding var selectedDate: Date
     @State private var isVisible = false
     @EnvironmentObject var appState: AppState
-    
+
     private var isToday: Bool {
         Calendar.current.isDateInToday(selectedDate)
     }
-    
+
     private var accentColor: Color {
         return appState.accentColor.swiftUIColor
     }
-    
+
     private var monthNumber: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MM"
         return formatter.string(from: selectedDate)
     }
-    
+
     private var dayNumber: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd"
         return formatter.string(from: selectedDate)
     }
-    
+
     private var yearNumber: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yy"
         return formatter.string(from: selectedDate)
     }
-    
+
     private var dayAbbreviation: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "E"
         return formatter.string(from: selectedDate)
     }
-    
+
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 0) {
             // Month (grayed out)
@@ -287,16 +288,16 @@ struct DateHeaderView: View {
                 .font(.system(size: 58, weight: .bold))
                 //.fontWidth(.expanded)
                 .fontDesign(.rounded)
-                .foregroundColor(.white.opacity(0.4))
+                .foregroundColor(appState.theme.textMuted)
                 .transition(.asymmetric(insertion: .move(edge: .leading).combined(with: .opacity).combined(with: .scale(scale: 0.5)), removal: .move(edge: .leading).combined(with: .opacity).combined(with: .scale(scale: 0.5))))
                 .id("month-\(monthNumber)")
             
-            // Day (white)
+            // Day (primary text)
             Text(dayNumber)
                 .font(.system(size: 58, weight: .bold))
                 //.fontWidth(.expanded)
                 .fontDesign(.rounded)
-                .foregroundColor(.white)
+                .foregroundColor(appState.theme.textPrimary)
                 .transition(.asymmetric(insertion: .scale(scale: 1.2).combined(with: .opacity), removal: .scale(scale: 0.8).combined(with: .opacity)))
                 .id("day-\(dayNumber)")
             
@@ -305,7 +306,7 @@ struct DateHeaderView: View {
                 .font(.system(size: 58, weight: .bold))
                 //.fontWidth(.expanded)
                 .fontDesign(.rounded)
-                .foregroundColor(.white.opacity(0.4))
+                .foregroundColor(appState.theme.textMuted)
                 .transition(.asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity).combined(with: .scale(scale: 0.5)), removal: .move(edge: .trailing).combined(with: .opacity).combined(with: .scale(scale: 0.5))))
                 .id("year-\(yearNumber)")
             
@@ -326,7 +327,7 @@ struct DateHeaderView: View {
             Text(dayAbbreviation)
                 .font(.system(size: 26, weight: .medium))
                 .fontDesign(.rounded)
-                .foregroundColor(.white.opacity(0.5))
+                .foregroundColor(appState.theme.textMuted)
                 .transition(.asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity).combined(with: .scale(scale: 0.5)), removal: .move(edge: .trailing).combined(with: .opacity).combined(with: .scale(scale: 0.5))))
                 .id("dayAbbr-\(dayAbbreviation)")
         }
@@ -338,11 +339,12 @@ struct DateHeaderView: View {
 
 struct StreakCounterView: View {
     @EnvironmentObject var streakManager: StreakManager
-    
+    @EnvironmentObject var appState: AppState
+
     private var streakColor: Color {
         let count = streakManager.currentStreak
         switch count {
-        case 0: return .white
+        case 0: return appState.theme.textPrimary
         case 1...10: return .orange
         case 11...20: return .red
         case 21...30: return .purple
@@ -351,14 +353,14 @@ struct StreakCounterView: View {
         default: return .yellow // Gold
         }
     }
-    
+
     var body: some View {
         HStack(spacing: 12) {
             // Fire icon
             Image(systemName: "flame.fill")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(streakColor)
-            
+
             // Streak count
             Text("\(streakManager.currentStreak)")
                 .font(.system(size: 24, weight: .bold, design: .rounded))
@@ -368,11 +370,11 @@ struct StreakCounterView: View {
         .frame(height: 68)
         .background(
             RoundedRectangle(cornerRadius: 48)
-                .fill(Color.white.opacity(0.08))
+                .fill(appState.theme.cardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 48)
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                .stroke(appState.theme.stroke, lineWidth: 1)
         )
     }
 }
@@ -380,11 +382,12 @@ struct StreakCounterView: View {
 struct EntryStatusView: View {
     @Binding var selectedTab: Int
     @EnvironmentObject var videoManager: VideoManager
-    
+    @EnvironmentObject var appState: AppState
+
     private var hasEntryToday: Bool {
         videoManager.getVideoForDate(Date()) != nil
     }
-    
+
     var body: some View {
         Button(action: {
             HapticManager.shared.light()
@@ -394,19 +397,19 @@ struct EntryStatusView: View {
                 if hasEntryToday {
                     Image(systemName: "checkmark")
                         .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.white)
-                    
+                        .foregroundColor(appState.theme.textPrimary)
+
                     Text("Entry recorded")
                         .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .foregroundColor(.white)
+                        .foregroundColor(appState.theme.textPrimary)
                 } else {
                     Image(systemName: "xmark")
                         .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.gray)
-                    
+                        .foregroundColor(appState.theme.textSecondary)
+
                     Text("No entry today")
                         .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .foregroundColor(.gray)
+                        .foregroundColor(appState.theme.textSecondary)
                 }
             }
         }
@@ -415,11 +418,11 @@ struct EntryStatusView: View {
         .frame(height: 68)
         .background(
             RoundedRectangle(cornerRadius: 48)
-                .fill(Color.white.opacity(0.08))
+                .fill(appState.theme.cardBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 48)
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                .stroke(appState.theme.stroke, lineWidth: 1)
         )
     }
 }
@@ -624,9 +627,8 @@ struct VideoPlayerView: View {
             player?.pause()
             player = nil
         }
-        .preferredColorScheme(.dark)
     }
-    
+
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium

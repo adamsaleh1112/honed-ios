@@ -148,7 +148,6 @@ struct YourJourneyView: View {
         }
         .navigationTitle("Your Journey")
         .navigationBarTitleDisplayMode(.inline)
-        .preferredColorScheme(.dark)
     }
 }
 

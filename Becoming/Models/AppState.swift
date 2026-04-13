@@ -29,6 +29,28 @@ enum AccentColorOption: String, CaseIterable {
     }
 }
 
+struct AppTheme {
+    let isDarkMode: Bool
+
+    // Backgrounds
+    var background: Color { isDarkMode ? Color(red: 0.06, green: 0.06, blue: 0.06) : Color.white }
+    var secondaryBackground: Color { isDarkMode ? Color(red: 0.12, green: 0.12, blue: 0.12) : Color(red: 0.95, green: 0.95, blue: 0.97) }
+    var cardBackground: Color { isDarkMode ? Color.white.opacity(0.08) : Color.black.opacity(0.05) }
+
+    // Text
+    var textPrimary: Color { isDarkMode ? .white : .black }
+    var textSecondary: Color { isDarkMode ? .gray : Color(red: 0.4, green: 0.4, blue: 0.4) }
+    var textMuted: Color { isDarkMode ? .white.opacity(0.5) : .black.opacity(0.4) }
+
+    // UI Elements
+    var divider: Color { isDarkMode ? Color.gray.opacity(0.15) : Color.black.opacity(0.1) }
+    var stroke: Color { isDarkMode ? Color.white.opacity(0.12) : Color.black.opacity(0.08) }
+    var overlay: Color { isDarkMode ? Color.black.opacity(0.6) : Color.black.opacity(0.4) }
+
+    // Dotted line
+    var dotColor: Color { isDarkMode ? Color.gray.opacity(0.15) : Color.black.opacity(0.12) }
+}
+
 class AppState: ObservableObject {
     @Published var isOnboarded: Bool = false
     @Published var hasRecordedToday: Bool = false
@@ -38,6 +60,8 @@ class AppState: ObservableObject {
     @Published var isDarkMode: Bool = true
     @Published var isLowercaseMode: Bool = false
     @Published var accentColor: AccentColorOption = .blue
+
+    var theme: AppTheme { AppTheme(isDarkMode: isDarkMode) }
     
     init() {
         loadUserDefaults()

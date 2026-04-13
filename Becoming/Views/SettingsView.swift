@@ -9,7 +9,7 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color(red: 0.06, green: 0.06, blue: 0.06).ignoresSafeArea()
+                appState.theme.background.ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 24) {
@@ -23,11 +23,11 @@ struct SettingsView: View {
                                         .frame(width: 28)
                                     Text("Your name")
                                         .font(.system(size: 16))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(appState.theme.textPrimary)
                                     Spacer()
                                     TextField("Enter name", text: $appState.userName)
                                         .font(.system(size: 16))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(appState.theme.textPrimary)
                                         .multilineTextAlignment(.trailing)
                                         .frame(maxWidth: 150)
                                 }
@@ -40,7 +40,7 @@ struct SettingsView: View {
                                             .frame(width: 28)
                                         Text("Your journey")
                                             .font(.system(size: 16))
-                                            .foregroundColor(.white)
+                                            .foregroundColor(appState.theme.textPrimary)
                                         Spacer()
                                         Image(systemName: "chevron.right")
                                             .font(.system(size: 12))
@@ -54,23 +54,102 @@ struct SettingsView: View {
                         // Appearance Settings
                         SettingsSection(title: "Appearance") {
                             VStack(spacing: 16) {
-                                HStack {
-                                    Image(systemName: "moon.fill")
-                                        .font(.system(size: 18))
-                                        .foregroundColor(.gray)
-                                        .frame(width: 28)
-                                    Toggle("Dark mode", isOn: $appState.isDarkMode)
+                                // Theme selector
+                                HStack(spacing: 12) {
+                                    Text("Theme")
                                         .font(.system(size: 16))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(appState.theme.textPrimary)
+
+                                    Spacer()
+
+                                    // Capsule icon toggle
+                                    HStack(spacing: 0) {
+                                        // Light button (sun icon)
+                                        Button(action: {
+                                            appState.isDarkMode = false
+                                            appState.saveUserDefaults()
+                                        }) {
+                                            ZStack {
+                                                Circle()
+                                                    .fill(!appState.isDarkMode ? appState.accentColor.swiftUIColor : Color.clear)
+                                                    .frame(width: 32, height: 32)
+                                                Image(systemName: "sun.max.fill")
+                                                    .font(.system(size: 14, weight: .semibold))
+                                                    .foregroundColor(!appState.isDarkMode ? .white : appState.theme.textSecondary)
+                                            }
+                                            .frame(width: 40, height: 40)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+
+                                        // Dark button (moon icon)
+                                        Button(action: {
+                                            appState.isDarkMode = true
+                                            appState.saveUserDefaults()
+                                        }) {
+                                            ZStack {
+                                                Circle()
+                                                    .fill(appState.isDarkMode ? appState.accentColor.swiftUIColor : Color.clear)
+                                                    .frame(width: 32, height: 32)
+                                                Image(systemName: "moon.fill")
+                                                    .font(.system(size: 14, weight: .semibold))
+                                                    .foregroundColor(appState.isDarkMode ? .white : appState.theme.textSecondary)
+                                            }
+                                            .frame(width: 40, height: 40)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                    }
+                                    .padding(4)
+                                    .background(appState.theme.cardBackground)
+                                    .clipShape(Capsule())
                                 }
-                                HStack {
-                                    Image(systemName: "textformat")
-                                        .font(.system(size: 18))
-                                        .foregroundColor(.gray)
-                                        .frame(width: 28)
-                                    Toggle("Lowercase text", isOn: $appState.isLowercaseMode)
+
+                                // Casing selector
+                                HStack(spacing: 12) {
+                                    Text("Casing")
                                         .font(.system(size: 16))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(appState.theme.textPrimary)
+
+                                    Spacer()
+
+                                    // Capsule icon toggle
+                                    HStack(spacing: 0) {
+                                        // Default button (textformat.characters icon)
+                                        Button(action: {
+                                            appState.isLowercaseMode = false
+                                            appState.saveUserDefaults()
+                                        }) {
+                                            ZStack {
+                                                Circle()
+                                                    .fill(!appState.isLowercaseMode ? appState.accentColor.swiftUIColor : Color.clear)
+                                                    .frame(width: 32, height: 32)
+                                                Image(systemName: "textformat.characters")
+                                                    .font(.system(size: 14, weight: .semibold))
+                                                    .foregroundColor(!appState.isLowercaseMode ? .white : appState.theme.textSecondary)
+                                            }
+                                            .frame(width: 40, height: 40)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+
+                                        // Lowercase button (characters.lowercase icon)
+                                        Button(action: {
+                                            appState.isLowercaseMode = true
+                                            appState.saveUserDefaults()
+                                        }) {
+                                            ZStack {
+                                                Circle()
+                                                    .fill(appState.isLowercaseMode ? appState.accentColor.swiftUIColor : Color.clear)
+                                                    .frame(width: 32, height: 32)
+                                                Image(systemName: "characters.lowercase")
+                                                    .font(.system(size: 14, weight: .semibold))
+                                                    .foregroundColor(appState.isLowercaseMode ? .white : appState.theme.textSecondary)
+                                            }
+                                            .frame(width: 40, height: 40)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                    }
+                                    .padding(4)
+                                    .background(appState.theme.cardBackground)
+                                    .clipShape(Capsule())
                                 }
                                 HStack {
                                     Image(systemName: "paintpalette")
@@ -79,7 +158,7 @@ struct SettingsView: View {
                                         .frame(width: 28)
                                     Text("Accent color")
                                         .font(.system(size: 16))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(appState.theme.textPrimary)
                                     Spacer()
                                     Picker("Accent Color", selection: $appState.accentColor) {
                                         ForEach(AccentColorOption.allCases, id: \.self) { color in
@@ -108,7 +187,7 @@ struct SettingsView: View {
                                         .frame(width: 28)
                                     Text("Daily reminder")
                                         .font(.system(size: 16))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(appState.theme.textPrimary)
                                     Spacer()
                                     DatePicker("", selection: $appState.notificationTime, displayedComponents: .hourAndMinute)
                                         .labelsHidden()
@@ -173,7 +252,6 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-            .preferredColorScheme(.dark)
         }
         .onChange(of: appState.notificationTime) { newTime in
             notificationManager.scheduleDailyNotification(at: newTime, streak: streakManager.currentStreak, userName: appState.userName)
@@ -227,23 +305,24 @@ struct SettingsView: View {
 struct SettingsSection<Content: View>: View {
     let title: String
     let content: Content
-    
+    @EnvironmentObject var appState: AppState
+
     init(title: String, @ViewBuilder content: () -> Content) {
         self.title = title
         self.content = content()
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
                 .font(.system(size: 18, weight: .medium))
-                .foregroundColor(.white)
-            
+                .foregroundColor(appState.theme.textPrimary)
+
             VStack(spacing: 12) {
                 content
             }
             .padding(20)
-            .background(Color.gray.opacity(0.1))
+            .background(appState.theme.cardBackground)
             .cornerRadius(24)
         }
     }
@@ -252,7 +331,8 @@ struct SettingsSection<Content: View>: View {
 struct StatRow: View {
     let label: String
     let value: String
-    
+    @EnvironmentObject var appState: AppState
+
     var body: some View {
         HStack {
             Text(label)
@@ -261,7 +341,7 @@ struct StatRow: View {
             Spacer()
             Text(value)
                 .font(.system(size: 16, weight: .semibold))
-                .foregroundColor(.white)
+                .foregroundColor(appState.theme.textPrimary)
         }
     }
 }
@@ -269,7 +349,8 @@ struct StatRow: View {
 struct InfoRow: View {
     let label: String
     let value: String
-    
+    @EnvironmentObject var appState: AppState
+
     var body: some View {
         HStack {
             Text(label)
@@ -278,7 +359,7 @@ struct InfoRow: View {
             Spacer()
             Text(value)
                 .font(.system(size: 16))
-                .foregroundColor(.white)
+                .foregroundColor(appState.theme.textPrimary)
         }
     }
 }
