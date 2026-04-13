@@ -3,6 +3,7 @@ import SwiftUI
 struct YourJourneyView: View {
     @EnvironmentObject var videoManager: VideoManager
     @EnvironmentObject var streakManager: StreakManager
+    @EnvironmentObject var appState: AppState
     
     // Computed properties for statistics
     private var totalVideoEntries: Int {
@@ -56,71 +57,71 @@ struct YourJourneyView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     // Journey Overview
-                    SettingsSection(title: "Journey Overview") {
+                    SettingsSection(title: "Journey Overview".lowercased(if: appState.isLowercaseMode)) {
                         VStack(spacing: 16) {
                             JourneyStatRow(
                                 icon: "video.fill",
                                 iconColor: .blue,
-                                label: "Video entries",
+                                label: "Video entries".lowercased(if: appState.isLowercaseMode),
                                 value: "\(totalVideoEntries)"
                             )
                             
                             JourneyStatRow(
                                 icon: "calendar",
                                 iconColor: .gray,
-                                label: "Date started",
+                                label: "Date started".lowercased(if: appState.isLowercaseMode),
                                 value: dateStarted
                             )
                         }
                     }
                     
                     // Rating Breakdown
-                    SettingsSection(title: "Rating Breakdown") {
+                    SettingsSection(title: "Rating Breakdown".lowercased(if: appState.isLowercaseMode)) {
                         VStack(spacing: 16) {
                             JourneyStatRow(
                                 icon: "star.fill",
                                 iconColor: .green,
-                                label: "Perfect days (10)",
+                                label: "Perfect days (10)".lowercased(if: appState.isLowercaseMode),
                                 value: "\(perfectDays)"
                             )
                             
                             JourneyStatRow(
                                 icon: "hand.thumbsup.fill",
                                 iconColor: .yellow,
-                                label: "Good days (7-9)",
+                                label: "Good days (7-9)".lowercased(if: appState.isLowercaseMode),
                                 value: "\(goodDays)"
                             )
                             
                             JourneyStatRow(
                                 icon: "minus.circle.fill",
                                 iconColor: .orange,
-                                label: "Mid days (5-6)",
+                                label: "Mid days (5-6)".lowercased(if: appState.isLowercaseMode),
                                 value: "\(midDays)"
                             )
                             
                             JourneyStatRow(
                                 icon: "hand.thumbsdown.fill",
                                 iconColor: .red,
-                                label: "Bad days (1-4)",
+                                label: "Bad days (1-4)".lowercased(if: appState.isLowercaseMode),
                                 value: "\(badDays)"
                             )
                         }
                     }
                     
                     // Streak Statistics
-                    SettingsSection(title: "Streak Statistics") {
+                    SettingsSection(title: "Streak Statistics".lowercased(if: appState.isLowercaseMode)) {
                         VStack(spacing: 16) {
                             JourneyStatRow(
                                 icon: "flame.fill",
                                 iconColor: .orange,
-                                label: "Current streak",
+                                label: "Current streak".lowercased(if: appState.isLowercaseMode),
                                 value: "\(streakManager.currentStreak) days"
                             )
                             
                             JourneyStatRow(
                                 icon: "trophy.fill",
                                 iconColor: .yellow,
-                                label: "Longest streak",
+                                label: "Longest streak".lowercased(if: appState.isLowercaseMode),
                                 value: "\(streakManager.longestStreak) days"
                             )
                         }
@@ -128,14 +129,14 @@ struct YourJourneyView: View {
                     
                     // Motivational Section
                     if totalVideoEntries > 0 {
-                        SettingsSection(title: "Your Progress") {
+                        SettingsSection(title: "Your Progress".lowercased(if: appState.isLowercaseMode)) {
                             VStack(spacing: 12) {
                                 Text(streakManager.motivationalMessage)
                                     .font(.system(size: 16, weight: .medium))
                                     .foregroundColor(.white)
                                     .multilineTextAlignment(.center)
                                 
-                                Text("Consistency Tier: \(streakManager.consistencyTier)")
+                                Text("Consistency Tier: \(streakManager.consistencyTier)".lowercased(if: appState.isLowercaseMode))
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(.gray)
                             }
@@ -146,7 +147,7 @@ struct YourJourneyView: View {
                 .padding(.horizontal, 24)
             }
         }
-        .navigationTitle("Your Journey")
+        .navigationTitle("Your Journey".lowercased(if: appState.isLowercaseMode))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

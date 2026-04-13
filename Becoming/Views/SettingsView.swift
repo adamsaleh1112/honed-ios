@@ -14,14 +14,14 @@ struct SettingsView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         // Profile Settings
-                        SettingsSection(title: "Profile") {
+                        SettingsSection(title: "Profile".lowercased(if: appState.isLowercaseMode)) {
                             VStack(spacing: 16) {
                                 HStack {
                                     Image(systemName: "person")
                                         .font(.system(size: 18))
                                         .foregroundColor(.gray)
                                         .frame(width: 28)
-                                    Text("Your name")
+                                    Text("Your name".lowercased(if: appState.isLowercaseMode))
                                         .font(.system(size: 16))
                                         .foregroundColor(appState.theme.textPrimary)
                                     Spacer()
@@ -38,7 +38,7 @@ struct SettingsView: View {
                                             .font(.system(size: 18))
                                             .foregroundColor(.gray)
                                             .frame(width: 28)
-                                        Text("Your journey")
+                                        Text("Your journey".lowercased(if: appState.isLowercaseMode))
                                             .font(.system(size: 16))
                                             .foregroundColor(appState.theme.textPrimary)
                                         Spacer()
@@ -52,11 +52,11 @@ struct SettingsView: View {
                         }
                         
                         // Appearance Settings
-                        SettingsSection(title: "Appearance") {
-                            VStack(spacing: 16) {
+                        SettingsSection(title: "Appearance".lowercased(if: appState.isLowercaseMode)) {
+                            VStack(spacing: 14) {
                                 // Theme selector
                                 HStack(spacing: 12) {
-                                    Text("Theme")
+                                    Text("Theme".lowercased(if: appState.isLowercaseMode))
                                         .font(.system(size: 16))
                                         .foregroundColor(appState.theme.textPrimary)
 
@@ -72,7 +72,7 @@ struct SettingsView: View {
                                             ZStack {
                                                 Circle()
                                                     .fill(!appState.isDarkMode ? appState.accentColor.swiftUIColor : Color.clear)
-                                                    .frame(width: 32, height: 32)
+                                                    .frame(width: 36, height: 36)
                                                 Image(systemName: "sun.max.fill")
                                                     .font(.system(size: 14, weight: .semibold))
                                                     .foregroundColor(!appState.isDarkMode ? .white : appState.theme.textSecondary)
@@ -89,7 +89,7 @@ struct SettingsView: View {
                                             ZStack {
                                                 Circle()
                                                     .fill(appState.isDarkMode ? appState.accentColor.swiftUIColor : Color.clear)
-                                                    .frame(width: 32, height: 32)
+                                                    .frame(width: 36, height: 36)
                                                 Image(systemName: "moon.fill")
                                                     .font(.system(size: 14, weight: .semibold))
                                                     .foregroundColor(appState.isDarkMode ? .white : appState.theme.textSecondary)
@@ -98,14 +98,14 @@ struct SettingsView: View {
                                         }
                                         .buttonStyle(PlainButtonStyle())
                                     }
-                                    .padding(4)
+                                    .padding(2)
                                     .background(appState.theme.cardBackground)
                                     .clipShape(Capsule())
                                 }
 
                                 // Casing selector
                                 HStack(spacing: 12) {
-                                    Text("Casing")
+                                    Text("Casing".lowercased(if: appState.isLowercaseMode))
                                         .font(.system(size: 16))
                                         .foregroundColor(appState.theme.textPrimary)
 
@@ -121,7 +121,7 @@ struct SettingsView: View {
                                             ZStack {
                                                 Circle()
                                                     .fill(!appState.isLowercaseMode ? appState.accentColor.swiftUIColor : Color.clear)
-                                                    .frame(width: 32, height: 32)
+                                                    .frame(width: 36, height: 36)
                                                 Image(systemName: "textformat.characters")
                                                     .font(.system(size: 14, weight: .semibold))
                                                     .foregroundColor(!appState.isLowercaseMode ? .white : appState.theme.textSecondary)
@@ -138,7 +138,7 @@ struct SettingsView: View {
                                             ZStack {
                                                 Circle()
                                                     .fill(appState.isLowercaseMode ? appState.accentColor.swiftUIColor : Color.clear)
-                                                    .frame(width: 32, height: 32)
+                                                    .frame(width: 36, height: 36)
                                                 Image(systemName: "characters.lowercase")
                                                     .font(.system(size: 14, weight: .semibold))
                                                     .foregroundColor(appState.isLowercaseMode ? .white : appState.theme.textSecondary)
@@ -147,7 +147,7 @@ struct SettingsView: View {
                                         }
                                         .buttonStyle(PlainButtonStyle())
                                     }
-                                    .padding(4)
+                                    .padding(2)
                                     .background(appState.theme.cardBackground)
                                     .clipShape(Capsule())
                                 }
@@ -156,7 +156,7 @@ struct SettingsView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor(.gray)
                                         .frame(width: 28)
-                                    Text("Accent color")
+                                    Text("Accent color".lowercased(if: appState.isLowercaseMode))
                                         .font(.system(size: 16))
                                         .foregroundColor(appState.theme.textPrimary)
                                     Spacer()
@@ -178,54 +178,54 @@ struct SettingsView: View {
                         }
                         
                         // Notification Settings
-                        SettingsSection(title: "Notifications") {
+                        SettingsSection(title: "Notifications".lowercased(if: appState.isLowercaseMode)) {
                             VStack(spacing: 16) {
                                 HStack {
                                     Image(systemName: "clock")
                                         .font(.system(size: 18))
                                         .foregroundColor(.gray)
                                         .frame(width: 28)
-                                    Text("Daily reminder")
+                                    Text("Daily reminder".lowercased(if: appState.isLowercaseMode))
                                         .font(.system(size: 16))
                                         .foregroundColor(appState.theme.textPrimary)
                                     Spacer()
                                     DatePicker("", selection: $appState.notificationTime, displayedComponents: .hourAndMinute)
                                         .labelsHidden()
-                                        .colorScheme(.dark)
+                                        .environment(\.colorScheme, appState.isDarkMode ? .dark : .light)
                                 }
                             }
                         }
                         
                         
                         // About Section
-                        SettingsSection(title: "About") {
+                        SettingsSection(title: "About".lowercased(if: appState.isLowercaseMode)) {
                             VStack(spacing: 16) {
                                 HStack {
                                     Image(systemName: "info.circle")
                                         .font(.system(size: 18))
                                         .foregroundColor(.gray)
                                         .frame(width: 28)
-                                    InfoRow(label: "Version", value: "1.0.0")
+                                    InfoRow(label: "Version".lowercased(if: appState.isLowercaseMode), value: "1.0.0")
                                 }
                                 HStack {
                                     Image(systemName: "number")
                                         .font(.system(size: 18))
                                         .foregroundColor(.gray)
                                         .frame(width: 28)
-                                    InfoRow(label: "Build", value: "1")
+                                    InfoRow(label: "Build".lowercased(if: appState.isLowercaseMode), value: "1")
                                 }
                             }
                         }
                         
                         // Reset Section
-                        SettingsSection(title: "Reset") {
+                        SettingsSection(title: "Reset".lowercased(if: appState.isLowercaseMode)) {
                             VStack(spacing: 16) {
                                 HStack {
                                     Image(systemName: "arrow.counterclockwise")
                                         .font(.system(size: 18))
                                         .foregroundColor(.red)
                                         .frame(width: 28)
-                                    Button("Reset Streak") {
+                                    Button("Reset Streak".lowercased(if: appState.isLowercaseMode)) {
                                         resetStreak()
                                     }
                                     .foregroundColor(.red)
@@ -237,7 +237,7 @@ struct SettingsView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor(.red)
                                         .frame(width: 28)
-                                    Button("Reset All Data") {
+                                    Button("Reset All Data".lowercased(if: appState.isLowercaseMode)) {
                                         resetAllData()
                                     }
                                     .foregroundColor(.red)

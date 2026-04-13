@@ -399,7 +399,7 @@ struct EntryStatusView: View {
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(appState.theme.textPrimary)
 
-                    Text("Entry recorded")
+                    Text("Entry recorded".lowercased(if: appState.isLowercaseMode))
                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                         .foregroundColor(appState.theme.textPrimary)
                 } else {
@@ -407,7 +407,7 @@ struct EntryStatusView: View {
                         .font(.system(size: 20, weight: .semibold))
                         .foregroundColor(appState.theme.textSecondary)
 
-                    Text("No entry today")
+                    Text("No entry today".lowercased(if: appState.isLowercaseMode))
                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                         .foregroundColor(appState.theme.textSecondary)
                 }
@@ -482,7 +482,7 @@ struct VideoPreviewPopup: View {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(alignment: .top) {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(formattedDate)
+                                Text(formattedDate.lowercased(if: appState.isLowercaseMode))
                                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                                     .foregroundColor(.white)
                                 
@@ -567,7 +567,7 @@ struct VideoPlayerView: View {
                         ProgressView()
                             .scaleEffect(1.5)
                             .tint(.white)
-                        Text("Loading video...")
+                        Text("Loading video...".lowercased(if: appState.isLowercaseMode))
                             .foregroundColor(.gray)
                     }
                 }
@@ -575,7 +575,7 @@ struct VideoPlayerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button("Done".lowercased(if: appState.isLowercaseMode)) {
                         player?.pause()
                         dismiss()
                     }
@@ -656,7 +656,7 @@ struct StreakPopup: View {
     
     var body: some View {
         VStack(spacing: 24) {
-            Text("Your current streak is")
+            Text("Your current streak is".lowercased(if: appState.isLowercaseMode))
                 .font(.system(size: 22, weight: .semibold, design: .rounded))
                 .foregroundColor(.white)
             
