@@ -19,7 +19,7 @@ struct CalendarTimelineView: View {
             // Day headers (fixed, not swiping)
             HStack {
                 ForEach(dayHeaders, id: \.self) { day in
-                    Text(day.lowercased(if: appState.isLowercaseMode))
+                    Text(appState.isLowercaseMode ? day.lowercased() : day)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(Color.gray.opacity(0.5))
                         .frame(maxWidth: .infinity)

@@ -136,7 +136,7 @@ struct YourJourneyView: View {
                                     .foregroundColor(.white)
                                     .multilineTextAlignment(.center)
                                 
-                                Text("Consistency Tier: \(streakManager.consistencyTier)".lowercased(if: appState.isLowercaseMode))
+                                Text(appState.isLowercaseMode ? "Consistency Tier: \(streakManager.consistencyTier)".lowercased() : "Consistency Tier: \(streakManager.consistencyTier)")
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(.gray)
                             }
@@ -166,7 +166,7 @@ struct JourneyStatRow: View {
                 .foregroundColor(iconColor)
                 .frame(width: 28)
             
-            Text(label.lowercased(if: appState.isLowercaseMode))
+            Text(appState.isLowercaseMode ? label.lowercased() : label)
                 .font(.system(size: 16))
                 .foregroundColor(.gray)
             

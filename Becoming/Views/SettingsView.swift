@@ -21,7 +21,7 @@ struct SettingsView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor(.gray)
                                         .frame(width: 28)
-                                    Text("Your name".lowercased(if: appState.isLowercaseMode))
+                                    Text(appState.isLowercaseMode ? "Your name".lowercased() : "Your name")
                                         .font(.system(size: 16))
                                         .foregroundColor(appState.theme.textPrimary)
                                     Spacer()
@@ -38,7 +38,7 @@ struct SettingsView: View {
                                             .font(.system(size: 18))
                                             .foregroundColor(.gray)
                                             .frame(width: 28)
-                                        Text("Your journey".lowercased(if: appState.isLowercaseMode))
+                                        Text(appState.isLowercaseMode ? "Your journey".lowercased() : "Your journey")
                                             .font(.system(size: 16))
                                             .foregroundColor(appState.theme.textPrimary)
                                         Spacer()
@@ -56,7 +56,7 @@ struct SettingsView: View {
                             VStack(spacing: 14) {
                                 // Theme selector
                                 HStack(spacing: 12) {
-                                    Text("Theme".lowercased(if: appState.isLowercaseMode))
+                                    Text(appState.isLowercaseMode ? "Theme".lowercased() : "Theme")
                                         .font(.system(size: 16))
                                         .foregroundColor(appState.theme.textPrimary)
 
@@ -105,7 +105,7 @@ struct SettingsView: View {
 
                                 // Casing selector
                                 HStack(spacing: 12) {
-                                    Text("Casing".lowercased(if: appState.isLowercaseMode))
+                                    Text(appState.isLowercaseMode ? "Casing".lowercased() : "Casing")
                                         .font(.system(size: 16))
                                         .foregroundColor(appState.theme.textPrimary)
 
@@ -156,7 +156,7 @@ struct SettingsView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor(.gray)
                                         .frame(width: 28)
-                                    Text("Accent color".lowercased(if: appState.isLowercaseMode))
+                                    Text(appState.isLowercaseMode ? "Accent color".lowercased() : "Accent color")
                                         .font(.system(size: 16))
                                         .foregroundColor(appState.theme.textPrimary)
                                     Spacer()
@@ -185,7 +185,7 @@ struct SettingsView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor(.gray)
                                         .frame(width: 28)
-                                    Text("Daily reminder".lowercased(if: appState.isLowercaseMode))
+                                    Text(appState.isLowercaseMode ? "Daily reminder".lowercased() : "Daily reminder")
                                         .font(.system(size: 16))
                                         .foregroundColor(appState.theme.textPrimary)
                                     Spacer()
@@ -205,14 +205,14 @@ struct SettingsView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor(.gray)
                                         .frame(width: 28)
-                                    InfoRow(label: "Version".lowercased(if: appState.isLowercaseMode), value: "1.0.0")
+                                    InfoRow(label: appState.isLowercaseMode ? "Version".lowercased() : "Version", value: "1.0.0")
                                 }
                                 HStack {
                                     Image(systemName: "number")
                                         .font(.system(size: 18))
                                         .foregroundColor(.gray)
                                         .frame(width: 28)
-                                    InfoRow(label: "Build".lowercased(if: appState.isLowercaseMode), value: "1")
+                                    InfoRow(label: appState.isLowercaseMode ? "Build".lowercased() : "Build", value: "1")
                                 }
                             }
                         }
@@ -225,7 +225,7 @@ struct SettingsView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor(.red)
                                         .frame(width: 28)
-                                    Button("Reset Streak".lowercased(if: appState.isLowercaseMode)) {
+                                    Button(appState.isLowercaseMode ? "Reset Streak".lowercased() : "Reset Streak") {
                                         resetStreak()
                                     }
                                     .foregroundColor(.red)
@@ -237,7 +237,7 @@ struct SettingsView: View {
                                         .font(.system(size: 18))
                                         .foregroundColor(.red)
                                         .frame(width: 28)
-                                    Button("Reset All Data".lowercased(if: appState.isLowercaseMode)) {
+                                    Button(appState.isLowercaseMode ? "Reset All Data".lowercased() : "Reset All Data") {
                                         resetAllData()
                                     }
                                     .foregroundColor(.red)
@@ -314,7 +314,7 @@ struct SettingsSection<Content: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(title.lowercased(if: appState.isLowercaseMode))
+            Text(appState.isLowercaseMode ? title.lowercased() : title)
                 .font(.system(size: 18, weight: .medium))
                 .foregroundColor(appState.theme.textPrimary)
 
