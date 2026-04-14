@@ -132,7 +132,7 @@ struct RecordingView: View {
                         // Save/Confirm State
                         if showSaveButton, let url = recordedVideoURL {
                             HStack {
-                                // Professional redo button on the left
+                                // Simple retry icon button
                                 Button(action: {
                                     DispatchQueue.main.async {
                                         HapticManager.shared.light()
@@ -141,44 +141,13 @@ struct RecordingView: View {
                                     recordedVideoURL = nil
                                     hasStartedRecording = false
                                 }) {
-                                    ZStack {
-                                        // Outer ring
-                                        Circle()
-                                            .stroke(
-                                                LinearGradient(
-                                                    colors: [Color.white.opacity(0.4), Color.white.opacity(0.2)],
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                ),
-                                                lineWidth: 2
-                                            )
-                                            .frame(width: 60, height: 60)
-                                        
-                                        // Main button
-                                        Circle()
-                                            .fill(
-                                                LinearGradient(
-                                                    colors: [Color.white.opacity(0.2), Color.white.opacity(0.1)],
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
-                                            )
-                                            .frame(width: 56, height: 56)
-                                            .shadow(
-                                                color: Color.black.opacity(0.1),
-                                                radius: 4,
-                                                x: 0,
-                                                y: 2
-                                            )
-                                        
-                                        Image(systemName: "arrow.counterclockwise")
-                                            .font(.system(size: 20, weight: .semibold))
-                                            .foregroundColor(.white)
-                                            .shadow(color: Color.black.opacity(0.2), radius: 1, x: 0, y: 1)
-                                    }
+                                    Image(systemName: "arrow.counterclockwise")
+                                        .font(.system(size: 32, weight: .semibold))
+                                        .foregroundColor(.white)
+                                        .shadow(color: Color.black.opacity(0.3), radius: 2, x: 0, y: 1)
+                                        .scaleEffect(1.0)
+                                        .animation(.spring(response: 0.4, dampingFraction: 0.6), value: showSaveButton)
                                 }
-                                .scaleEffect(1.0)
-                                .animation(.spring(response: 0.4, dampingFraction: 0.6), value: showSaveButton)
                                 
                                 Spacer()
                                 
