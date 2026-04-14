@@ -220,14 +220,10 @@ struct HomeContentView: View {
             HapticManager.shared.prepareLight()
             HapticManager.shared.prepareSoft()
 
-            // Staggered fade-in animation
-            headerOpacity = 0
-            headerOffset = -15
-            calendarOpacity = 0
-            calendarOffset = -15
-            bottomOpacity = 0
-            bottomOffset = -15
+            // Only animate if not already visible (prevents re-animation on tab switches)
+            guard headerOpacity == 0 else { return }
 
+            // Staggered fade-in animation
             withAnimation(.easeOut(duration: 0.4).delay(0.1)) {
                 headerOpacity = 1
                 headerOffset = 0

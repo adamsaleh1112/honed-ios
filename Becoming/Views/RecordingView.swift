@@ -201,7 +201,7 @@ struct RecordingView: View {
                                 }
                                 .scaleEffect(1.0)
                                 .animation(.spring(response: 0.4, dampingFraction: 0.6), value: showSaveButton)
-                                .offset(x: 4)
+                                .offset(x: 11)
                                 
                                 Spacer()
                                 
@@ -330,6 +330,7 @@ struct RecordingView: View {
                         if let url = recordedVideoURL {
                             videoManager.saveVideo(url: url, rating: rating)
                             streakManager.recordVideo()
+                            appState.recordedToday()
                             
                             // Reset state
                             showSaveButton = false
@@ -347,6 +348,7 @@ struct RecordingView: View {
                         if let url = recordedVideoURL {
                             videoManager.saveVideo(url: url, rating: nil)
                             streakManager.recordVideo()
+                            appState.recordedToday()
                             
                             // Reset state
                             showSaveButton = false
@@ -390,6 +392,9 @@ struct RecordingView: View {
         }
         .onDisappear {
             cameraManager.stopCamera()
+            // Clean up any pending recording segments
+            recordingSegments.removeAll()
+            isProcessingCameraSwitch = false
         }
     }
     
@@ -416,7 +421,16 @@ struct RecordingView: View {
                                     self.showSaveButton = true
                                     print("Combined video ready - showSaveButton set to true")
                                 } else {
-                                    print("Failed to combine video segments")
+                                    print("Failed to combine video segments - using first segment as fallback")
+                                    // Fallback: use the first segment if combination fails
+                                    if let firstSegment = self.recordingSegments.first {
+                                        self.recordedVideoURL = firstSegment
+                                        self.showSaveButton = true
+                                    } else {
+                                        print("Critical error: No segments available for fallback")
+                                        // Reset to allow user to try recording again
+                                        self.hasStartedRecording = false
+                                    }
                                 }
                                 // Clean up segments
                                 self.recordingSegments.removeAll()
@@ -429,7 +443,9 @@ struct RecordingView: View {
                         self.recordingSegments.removeAll()
                         print("Single segment recording - showSaveButton set to true")
                     } else {
-                        print("No recording segments found")
+                        print("No recording segments found - this should not happen")
+                        // Reset state to allow user to try again
+                        self.hasStartedRecording = false
                     }
                 }
             }
@@ -454,6 +470,12 @@ struct RecordingView: View {
     private func switchCameraDuringRecording() {
         guard !isProcessingCameraSwitch else {
             print("Already processing camera switch - ignoring")
+            return
+        }
+        
+        guard videoManager.isRecording else {
+            print("Not recording - switching to normal camera flip")
+            flipCamera()
             return
         }
         
@@ -629,7 +651,7 @@ struct RatingPopup: View {
         }) {
             Text("\(rating)")
                 .font(.system(size: 18, weight: .semibold, design: .rounded))
-                .foregroundColor(selectedRating == rating ? .black : .white)
+                .foregroundColor(.white)
                 .frame(width: 36, height: 42)
                 .background(
                     RoundedRectangle(cornerRadius: 10)

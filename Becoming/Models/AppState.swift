@@ -50,16 +50,36 @@ struct AppTheme {
 }
 
 class AppState: ObservableObject {
-    @Published var isOnboarded: Bool = false
-    @Published var hasRecordedToday: Bool = false
-    @Published var currentStreak: Int = 0
-    @Published var notificationTime: Date = Calendar.current.date(bySettingHour: 20, minute: 0, second: 0, of: Date()) ?? Date()
-    @Published var userName: String = ""
-    @Published var isDarkMode: Bool = true
-    @Published var isLowercaseMode: Bool = false
-    @Published var accentColor: AccentColorOption = .blue
+    @Published var isOnboarded: Bool = false {
+        didSet { scheduleSave() }
+    }
+    @Published var hasRecordedToday: Bool = false {
+        didSet { scheduleSave() }
+    }
+    @Published var currentStreak: Int = 0 {
+        didSet { scheduleSave() }
+    }
+    @Published var notificationTime: Date = Calendar.current.date(bySettingHour: 20, minute: 0, second: 0, of: Date()) ?? Date() {
+        didSet { scheduleSave() }
+    }
+    @Published var userName: String = "" {
+        didSet { scheduleSave() }
+    }
+    @Published var isDarkMode: Bool = true {
+        didSet { scheduleSave() }
+    }
+    @Published var isLowercaseMode: Bool = false {
+        didSet { scheduleSave() }
+    }
+    @Published var accentColor: AccentColorOption = .purple {
+        didSet { scheduleSave() }
+    }
 
     var theme: AppTheme { AppTheme(isDarkMode: isDarkMode) }
+    
+    // Batch save mechanism
+    private var saveTimer: Timer?
+    private let saveDelay: TimeInterval = 0.5
     
     init() {
         loadUserDefaults()
@@ -109,5 +129,12 @@ class AppState: ObservableObject {
     func recordedToday() {
         hasRecordedToday = true
         saveUserDefaults()
+    }
+    
+    private func scheduleSave() {
+        saveTimer?.invalidate()
+        saveTimer = Timer.scheduledTimer(withTimeInterval: saveDelay, repeats: false) { _ in
+            self.saveUserDefaults()
+        }
     }
 }

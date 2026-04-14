@@ -9,7 +9,7 @@ struct CalendarTimelineView: View {
     var onVideoSelected: ((VideoEntry) -> Void)? = nil
     
     private let calendar = Calendar.current
-    private let visibleMonthRange = -12...12 // Show 12 months back and forward
+    private let visibleMonthRange = -6...6 // Show 6 months back and forward for better performance
     
     // Cache day headers for performance
     private let dayHeaders = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
@@ -175,14 +175,22 @@ struct CalendarDayView: View {
                     .animation(.spring(response: 0.3, dampingFraction: 0.8, blendDuration: 0), value: isPressed)
                 
                 // Thumbnail image if video exists
-                if let thumbnailURL = video?.thumbnailURL,
-                   let uiImage = UIImage(contentsOfFile: thumbnailURL.path) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 52)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .opacity(isCurrentMonth ? 1.0 : 0.5)
+                if let thumbnailURL = video?.thumbnailURL {
+                    AsyncImage(url: thumbnailURL) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.gray.opacity(0.3))
+                            .overlay(
+                                ProgressView()
+                                    .scaleEffect(0.5)
+                            )
+                    }
+                    .frame(height: 52)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .opacity(isCurrentMonth ? 1.0 : 0.5)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(isSelected ? appState.accentColor.swiftUIColor : Color.clear, lineWidth: 2)

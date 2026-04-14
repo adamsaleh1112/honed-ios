@@ -215,7 +215,8 @@ struct OnboardingView: View {
         if currentStep < 3 {
             // Save notification time after step 1 and request permission
             if currentStep == 1 {
-                // appState.notificationTime = selectedTime
+                appState.notificationTime = selectedTime
+                appState.saveUserDefaults()
                 // Request notification permission now that user has selected a time
                 notificationManager.requestPermission()
                 notificationManager.scheduleDailyNotification(at: selectedTime, streak: 0, userName: appState.userName)
