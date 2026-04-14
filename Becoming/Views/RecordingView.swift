@@ -16,6 +16,8 @@ struct RecordingView: View {
     @State private var hasStartedRecording = false
     @State private var showRatingPopup = false
     @State private var selectedRating: Int? = nil
+    @State private var recordingSegments: [URL] = []
+    @State private var isProcessingCameraSwitch = false
     
     var onVideoSaved: (() -> Void)? = nil
     
@@ -303,6 +305,8 @@ struct RecordingView: View {
             showSaveButton = false
             recordedVideoURL = nil
             hasStartedRecording = false
+            recordingSegments.removeAll()
+            isProcessingCameraSwitch = false
             
             // Prepare haptics for immediate use
             HapticManager.shared.prepareLight()
@@ -323,30 +327,172 @@ struct RecordingView: View {
             cameraManager.stopRecording { url in
                 DispatchQueue.main.async {
                     print("Recording stopped - URL: \(url?.absoluteString ?? "nil")")
+                    
+                    // Add the final segment
                     if let url = url {
-                        self.recordedVideoURL = url
+                        self.recordingSegments.append(url)
+                    }
+                    
+                    // If we have multiple segments, combine them
+                    if self.recordingSegments.count > 1 {
+                        print("Combining \(self.recordingSegments.count) recording segments")
+                        self.combineVideoSegments(self.recordingSegments) { combinedURL in
+                            DispatchQueue.main.async {
+                                if let combinedURL = combinedURL {
+                                    self.recordedVideoURL = combinedURL
+                                    self.showSaveButton = true
+                                    print("Combined video ready - showSaveButton set to true")
+                                } else {
+                                    print("Failed to combine video segments")
+                                }
+                                // Clean up segments
+                                self.recordingSegments.removeAll()
+                            }
+                        }
+                    } else if let singleURL = self.recordingSegments.first {
+                        // Single segment, use directly
+                        self.recordedVideoURL = singleURL
                         self.showSaveButton = true
-                        print("showSaveButton set to true")
+                        self.recordingSegments.removeAll()
+                        print("Single segment recording - showSaveButton set to true")
                     } else {
-                        print("No URL received from recording")
+                        print("No recording segments found")
                     }
                 }
             }
         } else {
             print("Starting recording")
+            recordingSegments.removeAll() // Clear any previous segments
             videoManager.startRecording()
             cameraManager.startRecording(maxDuration: maxRecordingDuration)
         }
     }
     
     private func flipCamera() {
-        isFrontCamera.toggle()
-        
         if videoManager.isRecording {
-            print("Flipping camera during recording - maintaining recording session")
-            cameraManager.switchCameraDuringRecording(toFront: isFrontCamera)
+            print("Flipping camera during recording - using segmented approach")
+            switchCameraDuringRecording()
         } else {
+            isFrontCamera.toggle()
             cameraManager.switchCamera(toFront: isFrontCamera)
+        }
+    }
+    
+    private func switchCameraDuringRecording() {
+        guard !isProcessingCameraSwitch else {
+            print("Already processing camera switch - ignoring")
+            return
+        }
+        
+        isProcessingCameraSwitch = true
+        
+        // Step 1: Stop current recording and save segment
+        cameraManager.stopRecording { [weak self] url in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                
+                if let url = url {
+                    self.recordingSegments.append(url)
+                    print("Saved recording segment: \(url.lastPathComponent)")
+                }
+                
+                // Step 2: Switch camera
+                self.isFrontCamera.toggle()
+                self.cameraManager.switchCamera(toFront: self.isFrontCamera)
+                
+                // Step 3: Start new recording segment after a brief delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    self.cameraManager.startRecording(maxDuration: self.maxRecordingDuration)
+                    self.isProcessingCameraSwitch = false
+                    print("Started new recording segment with \(self.isFrontCamera ? "front" : "back") camera")
+                }
+            }
+        }
+    }
+    
+    private func combineVideoSegments(_ segments: [URL], completion: @escaping (URL?) -> Void) {
+        guard !segments.isEmpty else {
+            completion(nil)
+            return
+        }
+        
+        guard segments.count > 1 else {
+            completion(segments.first)
+            return
+        }
+        
+        let composition = AVMutableComposition()
+        guard let videoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: kCMPersistentTrackID_Invalid),
+              let audioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+            completion(nil)
+            return
+        }
+        
+        var currentTime = CMTime.zero
+        
+        for segmentURL in segments {
+            let asset = AVAsset(url: segmentURL)
+            
+            // Add video track
+            if let assetVideoTrack = asset.tracks(withMediaType: .video).first {
+                do {
+                    let timeRange = CMTimeRange(start: .zero, duration: asset.duration)
+                    try videoTrack.insertTimeRange(timeRange, of: assetVideoTrack, at: currentTime)
+                } catch {
+                    print("Error inserting video track: \(error)")
+                    completion(nil)
+                    return
+                }
+            }
+            
+            // Add audio track
+            if let assetAudioTrack = asset.tracks(withMediaType: .audio).first {
+                do {
+                    let timeRange = CMTimeRange(start: .zero, duration: asset.duration)
+                    try audioTrack.insertTimeRange(timeRange, of: assetAudioTrack, at: currentTime)
+                } catch {
+                    print("Error inserting audio track: \(error)")
+                    // Continue without audio for this segment
+                }
+            }
+            
+            currentTime = CMTimeAdd(currentTime, asset.duration)
+        }
+        
+        // Export the combined video
+        let outputURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("mov")
+        
+        guard let exportSession = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality) else {
+            completion(nil)
+            return
+        }
+        
+        exportSession.outputURL = outputURL
+        exportSession.outputFileType = .mov
+        
+        exportSession.exportAsynchronously {
+            DispatchQueue.main.async {
+                switch exportSession.status {
+                case .completed:
+                    print("Video segments combined successfully")
+                    completion(outputURL)
+                case .failed:
+                    print("Export failed: \(exportSession.error?.localizedDescription ?? "Unknown error")")
+                    completion(nil)
+                case .cancelled:
+                    print("Export cancelled")
+                    completion(nil)
+                default:
+                    completion(nil)
+                }
+                
+                // Clean up temporary segment files
+                for segmentURL in segments {
+                    try? FileManager.default.removeItem(at: segmentURL)
+                }
+            }
         }
     }
     
