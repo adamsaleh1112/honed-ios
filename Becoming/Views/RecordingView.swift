@@ -132,7 +132,7 @@ struct RecordingView: View {
                         // Save/Confirm State
                         if showSaveButton, let url = recordedVideoURL {
                             HStack {
-                                // Redo button on the left
+                                // Professional redo button on the left
                                 Button(action: {
                                     DispatchQueue.main.async {
                                         HapticManager.shared.light()
@@ -142,19 +142,47 @@ struct RecordingView: View {
                                     hasStartedRecording = false
                                 }) {
                                     ZStack {
+                                        // Outer ring
                                         Circle()
-                                            .fill(.ultraThinMaterial)
+                                            .stroke(
+                                                LinearGradient(
+                                                    colors: [Color.white.opacity(0.4), Color.white.opacity(0.2)],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                ),
+                                                lineWidth: 2
+                                            )
+                                            .frame(width: 60, height: 60)
+                                        
+                                        // Main button
+                                        Circle()
+                                            .fill(
+                                                LinearGradient(
+                                                    colors: [Color.white.opacity(0.2), Color.white.opacity(0.1)],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            )
                                             .frame(width: 56, height: 56)
+                                            .shadow(
+                                                color: Color.black.opacity(0.1),
+                                                radius: 4,
+                                                x: 0,
+                                                y: 2
+                                            )
                                         
                                         Image(systemName: "arrow.counterclockwise")
-                                            .font(.system(size: 22, weight: .semibold))
+                                            .font(.system(size: 20, weight: .semibold))
                                             .foregroundColor(.white)
+                                            .shadow(color: Color.black.opacity(0.2), radius: 1, x: 0, y: 1)
                                     }
                                 }
+                                .scaleEffect(1.0)
+                                .animation(.spring(response: 0.4, dampingFraction: 0.6), value: showSaveButton)
                                 
                                 Spacer()
                                 
-                                // Checkmark save button in the center
+                                // Professional confirm button in the center
                                 Button(action: {
                                     DispatchQueue.main.async {
                                         HapticManager.shared.medium()
@@ -163,16 +191,47 @@ struct RecordingView: View {
                                     showRatingPopup = true
                                 }) {
                                     ZStack {
+                                        // Outer ring with success glow
                                         Circle()
-                                            .fill(Color.white)
-                                            .frame(width: 80, height: 80)
-                                            .shadow(color: .white.opacity(0.5), radius: 12, x: 0, y: 2)
+                                            .stroke(
+                                                LinearGradient(
+                                                    colors: [Color.green.opacity(0.8), Color.green.opacity(0.4)],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                ),
+                                                lineWidth: 4
+                                            )
+                                            .frame(width: 84, height: 84)
+                                            .scaleEffect(1.0)
+                                            .opacity(1.0)
                                         
+                                        // Main button with success gradient
+                                        Circle()
+                                            .fill(
+                                                LinearGradient(
+                                                    colors: [Color.green, Color.green.opacity(0.8)],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            )
+                                            .frame(width: 74, height: 74)
+                                            .shadow(
+                                                color: Color.green.opacity(0.4),
+                                                radius: 8,
+                                                x: 0,
+                                                y: 4
+                                            )
+                                            .scaleEffect(1.0)
+                                        
+                                        // Checkmark icon
                                         Image(systemName: "checkmark")
-                                            .font(.system(size: 32, weight: .bold))
-                                            .foregroundColor(.black)
+                                            .font(.system(size: 28, weight: .bold))
+                                            .foregroundColor(.white)
+                                            .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
                                     }
                                 }
+                                .scaleEffect(1.0)
+                                .animation(.spring(response: 0.4, dampingFraction: 0.6), value: showSaveButton)
                                 
                                 Spacer()
                                 
@@ -230,10 +289,10 @@ struct RecordingView: View {
                                                     startPoint: .topLeading,
                                                     endPoint: .bottomTrailing
                                                 ),
-                                                lineWidth: 3
+                                                lineWidth: 4
                                             )
-                                            .frame(width: 90, height: 90)
-                                            .scaleEffect(videoManager.isRecording ? 1.1 : 1.0)
+                                            .frame(width: 84, height: 84)
+                                            .scaleEffect(videoManager.isRecording ? 1.05 : 1.0)
                                             .opacity(videoManager.isRecording ? 0.8 : 1.0)
                                         
                                         // Main button with gradient
@@ -251,7 +310,7 @@ struct RecordingView: View {
                                                         endPoint: .bottomTrailing
                                                     )
                                             )
-                                            .frame(width: 75, height: 75)
+                                            .frame(width: 74, height: 74)
                                             .shadow(
                                                 color: videoManager.isRecording ? 
                                                     Color.red.opacity(0.4) : 
@@ -260,7 +319,7 @@ struct RecordingView: View {
                                                 x: 0,
                                                 y: videoManager.isRecording ? 4 : 2
                                             )
-                                            .scaleEffect(videoManager.isRecording ? 0.85 : 1.0)
+                                            .scaleEffect(videoManager.isRecording ? 0.95 : 1.0)
                                         
                                         // Inner content
                                         if videoManager.isRecording {
