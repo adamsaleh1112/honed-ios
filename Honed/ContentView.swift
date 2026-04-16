@@ -71,7 +71,16 @@ struct HomeContentView: View {
     @State private var calendarOpacity = 0.0
     @State private var calendarOffset: CGFloat = -15
     
+    // Bottom sheet states
+    @State private var isExpanded = false
+    @State private var dragOffset: CGFloat = 0
+    @State private var isDragging = false
+    private let expandedHeight: CGFloat = 840
+    private let peekOffset: CGFloat = 600
+    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .soft)
+    
     var body: some View {
+        GeometryReader { geometry in
         ZStack {
             appState.theme.background.ignoresSafeArea()
             
@@ -104,6 +113,79 @@ struct HomeContentView: View {
                 
                 Spacer()
             }
+            
+            // Draggable bottom sheet - always 840px, slides up/down
+            VStack(spacing: 0) {
+                Spacer()
+                DayDetailsSheet(
+                    selectedDate: $selectedDate,
+                    isExpanded: isExpanded
+                )
+                .frame(height: expandedHeight)
+                .offset(y: (isExpanded ? 0 : peekOffset) + dragOffset)
+                .gesture(
+                    DragGesture(minimumDistance: 10)
+                        .onChanged { value in
+                            isDragging = true
+                            let translation = value.translation.height
+                            let maxOverDrag: CGFloat = 24
+                            let dampingFactor: CGFloat = 0.3
+                            
+                            if isExpanded {
+                                // From expanded (offset 0), dragging down goes toward peek
+                                // Free movement until reaching peekOffset, then damp beyond
+                                if translation >= 0 && translation <= peekOffset {
+                                    // Within range: follow finger 1:1
+                                    dragOffset = translation
+                                } else if translation > peekOffset {
+                                    // Beyond peek: damp the over-drag
+                                    let overDrag = translation - peekOffset
+                                    dragOffset = peekOffset + maxOverDrag * (1 - exp(-dampingFactor * overDrag / maxOverDrag))
+                                } else {
+                                    // Trying to drag up from expanded (beyond range): damp
+                                    dragOffset = -maxOverDrag * (1 - exp(dampingFactor * translation / maxOverDrag))
+                                }
+                            } else {
+                                // From peek (offset peekOffset), dragging up goes toward expanded
+                                // Free movement until reaching 0, then damp beyond
+                                if translation <= 0 && translation >= -peekOffset {
+                                    // Within range: follow finger 1:1
+                                    dragOffset = translation
+                                } else if translation < -peekOffset {
+                                    // Beyond expanded: damp the over-drag
+                                    let overDrag = abs(translation) - peekOffset
+                                    dragOffset = -peekOffset - maxOverDrag * (1 - exp(-dampingFactor * overDrag / maxOverDrag))
+                                } else {
+                                    // Trying to drag down from peek (beyond range): damp
+                                    dragOffset = maxOverDrag * (1 - exp(-dampingFactor * translation / maxOverDrag))
+                                }
+                            }
+                        }
+                        .onEnded { value in
+                            isDragging = false
+                            let dragAmount = value.translation.height
+                            let velocity = value.predictedEndLocation.y - value.location.y
+                            
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                                if dragAmount > 100 || velocity > 300 {
+                                    isExpanded = false
+                                } else if dragAmount < -100 || velocity < -300 {
+                                    isExpanded = true
+                                }
+                                // Reset drag offset - sheet will animate to new position
+                                dragOffset = 0
+                            }
+                        }
+                )
+                .onChange(of: isExpanded) { _ in
+                    feedbackGenerator.impactOccurred()
+                }
+                .onAppear {
+                    feedbackGenerator.prepare()
+                }
+            }
+            .ignoresSafeArea(edges: .bottom)
+        }
             .onAppear {
                 // Reset states first for re-animation
                 headerOpacity = 0
@@ -215,6 +297,77 @@ struct DateHeaderView: View {
         .padding(.vertical, 16)
         .padding(.horizontal, 4)
         .animation(.spring(response: 0.5, dampingFraction: 0.7, blendDuration: 0), value: selectedDate)
+    }
+}
+
+struct DayDetailsSheet: View {
+    @Binding var selectedDate: Date
+    let isExpanded: Bool
+    @EnvironmentObject var appState: AppState
+    
+    private var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: selectedDate)
+    }
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Handle bar
+            Capsule()
+                .fill(appState.theme.textMuted.opacity(0.4))
+                .frame(width: 40, height: 5)
+                .padding(.top, 12)
+                .padding(.bottom, 16)
+            
+            // Date header in sheet
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(formattedDate)
+                        .font(.system(size: 20, weight: .semibold))
+                        .fontWidth(.expanded)
+                        .foregroundColor(appState.theme.textPrimary)
+                }
+                
+                Spacer()
+            }
+            .padding(.horizontal, 24)
+            
+            // Content area
+            VStack {
+                Spacer()
+                
+                Text("Workout details coming soon")
+                    .font(.system(size: 16))
+                    .foregroundColor(appState.theme.textMuted)
+                
+                Spacer()
+            }
+            .padding(.top, 40)
+        }
+        .frame(maxWidth: .infinity)
+        .background(Color.black.opacity(0.5))
+        .background(.thinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 52, style: .continuous))
+        .overlay(
+            // Gradient stroke that fades from gray at top to black halfway down
+            GeometryReader { geometry in
+                RoundedRectangle(cornerRadius: 52, style: .continuous)
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                Color.gray.opacity(0.2),
+                                Color.gray.opacity(0.1),
+                                Color.black
+                            ],
+                            startPoint: .top,
+                            endPoint: UnitPoint(x: 0.5, y: 0.55)
+                        ),
+                        lineWidth: 1
+                    )
+            }
+        )
+        .shadow(color: .black.opacity(0.3), radius: 12, x: 0, y: -6)
     }
 }
 

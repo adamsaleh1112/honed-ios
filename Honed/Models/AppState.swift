@@ -5,8 +5,8 @@ enum AccentColorOption: String, CaseIterable {
     case lime = "Lime"
     
     var swiftUIColor: Color {
-        // Fixed lime green: #b0d936
-        Color(red: 0.69, green: 0.851, blue: 0.212)
+        // Fixed accent color: #ADF93A
+        Color(red: 0.678, green: 0.976, blue: 0.227)
     }
 }
 
