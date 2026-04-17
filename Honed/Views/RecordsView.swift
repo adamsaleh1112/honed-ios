@@ -274,7 +274,7 @@ struct RecordsTabView: View {
                 }
             }
             .padding(.top, 120)
-            .padding(.bottom, 60)
+            .padding(.bottom, 80)
         }
         .scrollIndicators(.hidden)
     }
@@ -332,7 +332,7 @@ struct ProgressTabView: View {
                 }
             }
             .padding(.top, 120)
-            .padding(.bottom, 60)
+            .padding(.bottom, 80)
         }
         .scrollIndicators(.hidden)
     }
@@ -416,7 +416,7 @@ struct BadgesTabView: View {
                 }
             }
             .padding(.top, 120)
-            .padding(.bottom, 60)
+            .padding(.bottom, 80)
         }
         .scrollIndicators(.hidden)
         .sheet(item: $selectedBadge) { badge in
