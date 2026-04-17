@@ -7,91 +7,72 @@ struct RestDaysView: View {
     let daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            VStack(spacing: 12) {
-                Text("Rest days")
-                    .font(.system(size: 32, weight: .semibold))
-                    .foregroundColor(appState.theme.textPrimary)
+        ZStack {
+            DarkMeshGradientBackground()
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Header
+                VStack(spacing: 12) {
+                    Text("REST DAYS")
+                        .font(.system(size: 32, weight: .regular))
+                        .fontWidth(.expanded)
+                        .foregroundColor(appState.theme.textPrimary)
+                    
+                    Text("Select any days you can't work out")
+                        .font(.system(size: 17))
+                        .foregroundColor(appState.theme.textMuted)
+                }
+                .padding(.top, 60)
+                .padding(.horizontal, 24)
                 
-                Text("Select any days you can't work out")
-                    .font(.system(size: 17))
-                    .foregroundColor(appState.theme.textMuted)
-            }
-            .padding(.top, 60)
-            .padding(.horizontal, 24)
-            
-            Spacer()
-            
-            // Day selector
-            VStack(spacing: 16) {
-                HStack(spacing: 12) {
-                    ForEach(0..<7, id: \.self) { index in
-                        DayToggleButton(
-                            day: daysOfWeek[index],
-                            index: index,
-                            isSelected: authState.restDays.contains(index)
-                        ) {
-                            toggleDay(index)
+                Spacer()
+                
+                // Day selector
+                VStack(spacing: 16) {
+                    HStack(spacing: 12) {
+                        ForEach(0..<7, id: \.self) { index in
+                            DayToggleButton(
+                                day: daysOfWeek[index],
+                                index: index,
+                                isSelected: authState.restDays.contains(index),
+                                action: { toggleDay(index) }
+                            )
                         }
                     }
+                    .padding(.horizontal, 24)
+                    
+                    // Calendar preview
+                    MiniCalendarPreview(routine: authState.routine, restDays: authState.restDays)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 8)
                 }
-                .padding(.horizontal, 24)
                 
-                // Info text
-                if !authState.restDays.isEmpty {
-                    Text("\(authState.restDays.count) day(s) marked as rest days")
-                        .font(.system(size: 14))
-                        .foregroundColor(appState.theme.textMuted)
-                        .transition(.opacity)
-                } else {
-                    Text("No rest days selected - you can work out any day")
-                        .font(.system(size: 14))
-                        .foregroundColor(appState.theme.textMuted)
-                        .transition(.opacity)
-                }
-            }
-            
-            Spacer()
-            
-            // Calendar preview
-            VStack(spacing: 12) {
-                Text("Preview")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(appState.theme.textMuted)
+                Spacer()
                 
-                MiniCalendarPreview(
-                    routine: authState.routine,
-                    restDays: authState.restDays
-                )
-                .frame(height: 200)
-                .padding(.horizontal, 24)
-            }
-            
-            Spacer()
-            
-            // Continue button
-            VStack(spacing: 12) {
-                Button(action: completeOnboarding) {
-                    Text("Get Started")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 56)
-                        .background(
-                            RoundedRectangle(cornerRadius: 40)
-                                .fill(appState.accentColor.swiftUIColor)
-                        )
+                // Continue button
+                VStack(spacing: 12) {
+                    Button(action: completeOnboarding) {
+                        Text("Continue")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(
+                                RoundedRectangle(cornerRadius: 40)
+                                    .fill(appState.accentColor.swiftUIColor)
+                            )
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    Button(action: skipStep) {
+                        Text("Skip for now")
+                            .font(.system(size: 15))
+                            .foregroundColor(appState.theme.textMuted)
+                    }
                 }
-                .padding(.horizontal, 24)
-                
-                Button(action: skipStep) {
-                    Text("Skip for now")
-                        .font(.system(size: 15))
-                        .foregroundColor(appState.theme.textMuted)
-                }
+                .padding(.bottom, 40)
             }
-            .padding(.bottom, 40)
         }
     }
     
@@ -134,9 +115,10 @@ struct DayToggleButton: View {
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
-                Text(day)
-                    .font(.system(size: 15, weight: .medium))
+            VStack(spacing: 4) {
+                Text(day.uppercased())
+                    .font(.system(size: 20, weight: .medium))
+                    .fontWidth(.compressed)
                 
                 Circle()
                     .fill(isSelected ? appState.accentColor.swiftUIColor : appState.theme.cardBackground)
@@ -149,12 +131,13 @@ struct DayToggleButton: View {
             .foregroundColor(isSelected ? appState.theme.textPrimary : appState.theme.textMuted)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
+            .padding(.horizontal, 2)
             .background(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 8)
                     .fill(isSelected ? appState.accentColor.swiftUIColor.opacity(0.15) : appState.theme.cardBackground)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 8)
                     .stroke(isSelected ? appState.accentColor.swiftUIColor.opacity(0.3) : Color.clear, lineWidth: 1)
             )
         }
@@ -176,7 +159,7 @@ struct MiniCalendarPreview: View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
             ForEach(0..<daysToShow, id: \.self) { offset in
                 if let date = calendar.date(byAdding: .day, value: offset, to: startDate) {
-                    let weekday = calendar.component(.weekday, from: date) - 1 // 0 = Sunday
+                    let weekday = calendar.component(.weekday, from: date) - 1
                     let isRestDay = restDays.contains(weekday)
                     let workoutDay = routine.workoutForDate(date, startingFrom: startDate)
                     
@@ -214,12 +197,17 @@ struct MiniDayCell: View {
             
             VStack(spacing: 2) {
                 Text(dayFormatter.string(from: date))
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 16, weight: .medium))
+                    .fontWidth(.compressed)
                     .foregroundColor(textColor)
                 
-                if let day = workoutDay, !isRestDay {
+                if let day = workoutDay {
                     Circle()
                         .fill(day.swiftUIColor)
+                        .frame(width: 4, height: 4)
+                } else if isRestDay {
+                    Circle()
+                        .fill(appState.theme.textMuted.opacity(0.3))
                         .frame(width: 4, height: 4)
                 }
             }

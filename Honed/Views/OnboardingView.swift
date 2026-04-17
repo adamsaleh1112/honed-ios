@@ -81,15 +81,15 @@ struct CompletionStep: View {
     
     var body: some View {
         VStack(spacing: 50) {
-            Text("You're ready!")
-                .font(.system(size: 38, weight: .semibold))
+            Text("YOU'RE READY")
+                .font(.system(size: 38, weight: .regular))
+                .fontWidth(.expanded)
                 .foregroundColor(appState.theme.textPrimary)
                 .transition(.opacity.combined(with: .scale(scale: 0.9)))
             
             Text("Start your journey.")
-                .font(.system(size: 22, weight: .semibold))
+                .font(.system(size: 22, weight: .regular))
                 .foregroundColor(appState.theme.textSecondary)
-                .multilineTextAlignment(.center)
                 .transition(.opacity.combined(with: .offset(y: 15)))
             
             Button(action: {
@@ -126,6 +126,78 @@ struct CompletionStep: View {
 
 class OnboardingFlow: ObservableObject {
     // Placeholder for any shared onboarding state
+}
+
+struct DarkMeshGradientBackground: View {
+    @State private var phase: Float = 0
+    
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1/30, paused: false)) { _ in
+            MeshGradient(
+                width: 5,
+                height: 5,
+                points: [
+                    // Row 0 (top) - all black edges
+                    [0.0, 0.0], [0.25, 0.0], [0.5, 0.0], [0.75, 0.0], [1.0, 0.0],
+                    // Row 1 - outer black, inner starts glowing
+                    [0.0, 0.25], [0.25, 0.25], [animatedX(0.35, 0.65), animatedY(0.15, 0.35)], [0.75, 0.25], [1.0, 0.25],
+                    // Row 2 - center with moving green glow
+                    [0.0, 0.5], [animatedX(0.15, 0.35), animatedY(0.35, 0.65)], [animatedCenterX, animatedCenterY], [animatedX(0.65, 0.85), animatedY(0.35, 0.65)], [1.0, 0.5],
+                    // Row 3 - outer black, inner glow
+                    [0.0, 0.75], [0.25, 0.75], [animatedX(0.35, 0.65), animatedY(0.65, 0.85)], [0.75, 0.75], [1.0, 0.75],
+                    // Row 4 (bottom) - all black edges
+                    [0.0, 1.0], [0.25, 1.0], [0.5, 1.0], [0.75, 1.0], [1.0, 1.0]
+                ],
+                colors: [
+                    // Corners and edges - pure black
+                    .black, .black, .black, .black, .black,
+                    .black, darkGreenGlow(0.3), brightGreenGlow(0.7), darkGreenGlow(0.3), .black,
+                    .black, brightGreenGlow(0.5), brightGreenGlow(1.0), brightGreenGlow(0.5), .black,
+                    .black, darkGreenGlow(0.3), brightGreenGlow(0.7), darkGreenGlow(0.3), .black,
+                    .black, .black, .black, .black, .black
+                ]
+            )
+        }
+        .onAppear {
+            withAnimation(.linear(duration: 8.0).repeatForever(autoreverses: false)) {
+                phase = 2 * .pi
+            }
+        }
+    }
+    
+    private var animatedCenterX: Float {
+        0.5 + sin(phase) * 0.15
+    }
+    
+    private var animatedCenterY: Float {
+        0.5 + cos(phase * 0.7) * 0.15
+    }
+    
+    private func animatedX(_ min: Float, _ max: Float) -> Float {
+        let offset = sin(phase + 1.0) * 0.08
+        return (min + max) / 2 + offset
+    }
+    
+    private func animatedY(_ min: Float, _ max: Float) -> Float {
+        let offset = cos(phase * 1.3 + 2.0) * 0.08
+        return (min + max) / 2 + offset
+    }
+    
+    private func brightGreenGlow(_ intensity: Double) -> Color {
+        Color(
+            red: 0.02 + 0.06 * intensity,
+            green: 0.08 + 0.12 * intensity,
+            blue: 0.01 + 0.04 * intensity
+        )
+    }
+    
+    private func darkGreenGlow(_ intensity: Double) -> Color {
+        Color(
+            red: 0.03 * intensity,
+            green: 0.06 * intensity,
+            blue: 0.02 * intensity
+        )
+    }
 }
 
 struct AnimatedMeshGradientBackground: View {

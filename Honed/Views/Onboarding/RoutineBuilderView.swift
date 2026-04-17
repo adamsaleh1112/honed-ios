@@ -7,111 +7,99 @@ struct RoutineBuilderView: View {
     @State private var draggedItem: WorkoutDayType?
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            VStack(spacing: 12) {
-                Text("Build your routine")
-                    .font(.system(size: 32, weight: .semibold))
-                    .foregroundColor(appState.theme.textPrimary)
-                
-                Text("Add days to create your workout cycle")
-                    .font(.system(size: 17))
-                    .foregroundColor(appState.theme.textMuted)
-            }
-            .padding(.top, 40)
-            .padding(.horizontal, 24)
+        ZStack {
+            DarkMeshGradientBackground()
+                .ignoresSafeArea()
             
-            // Routine display
-            if authState.routine.days.isEmpty {
-                // Empty state
-                Spacer()
-                
-                VStack(spacing: 16) {
-                    Image(systemName: "dumbbell.fill")
-                        .font(.system(size: 48))
-                        .foregroundColor(appState.theme.textMuted.opacity(0.5))
+            VStack(spacing: 0) {
+                // Header
+                VStack(spacing: 12) {
+                    Text("BUILD YOUR ROUTINE")
+                        .font(.system(size: 32, weight: .regular))
+                        .fontWidth(.expanded)
+                        .foregroundColor(appState.theme.textPrimary)
                     
-                    Text("No days added yet")
-                        .font(.system(size: 17, weight: .medium))
+                    Text("Add days to create your workout cycle")
+                        .font(.system(size: 17))
                         .foregroundColor(appState.theme.textMuted)
-                    
-                    Text("Tap + to add your first workout day")
-                        .font(.system(size: 14))
-                        .foregroundColor(appState.theme.textMuted.opacity(0.7))
                 }
+                .padding(.top, 40)
+                .padding(.horizontal, 24)
                 
-                Spacer()
-            } else {
-                // List of days
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(Array(authState.routine.days.enumerated()), id: \.element.id) { index, day in
-                            RoutineDayCard(
-                                day: day,
-                                index: index,
-                                onDelete: { deleteDay(at: index) },
-                                onMove: { direction in moveDay(from: index, direction: direction) }
-                            )
-                        }
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 24)
-                }
-                
-                // Cycle preview
-                VStack(spacing: 8) {
-                    Text("Your cycle repeats indefinitely")
-                        .font(.system(size: 13))
-                        .foregroundColor(appState.theme.textMuted)
+                // Routine display
+                if authState.routine.days.isEmpty {
+                    // Empty state
+                    Spacer()
                     
-                    HStack(spacing: 4) {
-                        ForEach(authState.routine.days.prefix(5), id: \.id) { day in
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(day.swiftUIColor)
-                                .frame(width: 24, height: 8)
-                        }
-                        if authState.routine.days.count > 5 {
-                            Text("+")
-                                .font(.system(size: 12))
-                                .foregroundColor(appState.theme.textMuted)
-                        }
-                    }
-                }
-                .padding(.vertical, 16)
-            }
-            
-            // Bottom buttons
-            VStack(spacing: 12) {
-                // Add button
-                Button(action: { showingDayPicker = true }) {
-                    ZStack {
-                        Circle()
-                            .fill(appState.accentColor.swiftUIColor)
-                            .frame(width: 64, height: 64)
+                    VStack(spacing: 16) {
+                        Image(systemName: "dumbbell.fill")
+                            .font(.system(size: 48))
+                            .foregroundColor(appState.theme.textMuted.opacity(0.5))
                         
-                        Image(systemName: "plus")
-                            .font(.system(size: 28, weight: .semibold))
-                            .foregroundColor(.black)
+                        Text("Add your first workout day")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(appState.theme.textPrimary)
+                        
+                        Text("Build a custom routine that fits your schedule")
+                            .font(.system(size: 15))
+                            .foregroundColor(appState.theme.textMuted)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.horizontal, 40)
+                    
+                    Spacer()
+                } else {
+                    // List of days
+                    ScrollView {
+                        LazyVStack(spacing: 12) {
+                            ForEach(Array(authState.routine.days.enumerated()), id: \.element.id) { index, day in
+                                RoutineDayCard(
+                                    day: day,
+                                    index: index,
+                                    onDelete: { deleteDay(at: index) },
+                                    onMove: { direction in moveDay(from: index, direction: direction) }
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 20)
                     }
                 }
-                .padding(.bottom, 8)
                 
-                // Continue button
-                Button(action: continueToRestDays) {
-                    Text("Continue")
+                // Bottom buttons
+                VStack(spacing: 12) {
+                    Button(action: { showingDayPicker = true }) {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                            Text("Add Day")
+                        }
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(authState.routine.days.isEmpty ? appState.theme.textMuted : .black)
+                        .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
                         .frame(height: 56)
                         .background(
                             RoundedRectangle(cornerRadius: 40)
-                                .fill(authState.routine.days.isEmpty ? appState.theme.cardBackground : appState.accentColor.swiftUIColor)
+                                .fill(appState.accentColor.swiftUIColor)
                         )
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    Button(action: continueToRestDays) {
+                        Text("Continue")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(authState.routine.days.isEmpty ? appState.theme.textMuted : .black)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(
+                                RoundedRectangle(cornerRadius: 40)
+                                    .fill(authState.routine.days.isEmpty ? appState.theme.cardBackground : appState.accentColor.swiftUIColor)
+                            )
+                    }
+                    .disabled(authState.routine.days.isEmpty)
+                    .padding(.horizontal, 24)
                 }
-                .disabled(authState.routine.days.isEmpty)
-                .padding(.horizontal, 24)
+                .padding(.bottom, 32)
             }
-            .padding(.bottom, 32)
         }
         .sheet(isPresented: $showingDayPicker) {
             DayPickerSheet { dayType in
@@ -170,7 +158,7 @@ struct RoutineDayCard: View {
             
             // Name
             Text(day.name)
-                .font(.system(size: 17, weight: .medium))
+                .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(appState.theme.textPrimary)
             
             Spacer()
@@ -189,18 +177,15 @@ struct RoutineDayCard: View {
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(appState.theme.textMuted)
                 }
-                .disabled(false) // Always enabled for simplicity
+                .disabled(index == 0)
             }
             .frame(width: 32)
             
             // Delete button
             Button(action: onDelete) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(appState.theme.textMuted)
-                    .frame(width: 32, height: 32)
-                    .background(appState.theme.cardBackground)
-                    .clipShape(Circle())
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(appState.theme.textMuted.opacity(0.5))
             }
         }
         .padding(.horizontal, 16)
@@ -211,26 +196,40 @@ struct RoutineDayCard: View {
 }
 
 struct DayPickerSheet: View {
-    let onSelect: (WorkoutDayType) -> Void
-    @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) private var dismiss
-    
-    let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
-    ]
+    @EnvironmentObject var appState: AppState
+    let onSelect: (WorkoutDayType) -> Void
     
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 12) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 16) {
                     ForEach(WorkoutDayType.allTypes) { dayType in
-                        DayTypeButton(dayType: dayType) {
+                        Button(action: {
                             onSelect(dayType)
+                        }) {
+                            VStack(spacing: 12) {
+                                Image(systemName: dayType.icon)
+                                    .font(.system(size: 32))
+                                    .foregroundColor(dayType.swiftUIColor)
+                                
+                                Text(dayType.name)
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(appState.theme.textPrimary)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 100)
+                            .background(dayType.swiftUIColor.opacity(0.1))
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(dayType.swiftUIColor.opacity(0.3), lineWidth: 2)
+                            )
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
-                .padding(16)
+                .padding(20)
             }
             .navigationTitle("Select Day Type")
             .navigationBarTitleDisplayMode(.inline)
@@ -239,39 +238,9 @@ struct DayPickerSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundColor(appState.theme.textSecondary)
                 }
             }
-            .background(appState.theme.background.ignoresSafeArea())
         }
-    }
-}
-
-struct DayTypeButton: View {
-    let dayType: WorkoutDayType
-    let action: () -> Void
-    @EnvironmentObject var appState: AppState
-    
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 12) {
-                Image(systemName: dayType.icon)
-                    .font(.system(size: 28))
-                    .foregroundColor(dayType.swiftUIColor)
-                    .frame(width: 60, height: 60)
-                    .background(dayType.swiftUIColor.opacity(0.15))
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                
-                Text(dayType.name)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(appState.theme.textPrimary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(appState.theme.cardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-        }
-        .buttonStyle(PlainButtonStyle())
     }
 }
 
